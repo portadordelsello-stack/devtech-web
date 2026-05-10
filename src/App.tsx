@@ -1,4 +1,5 @@
-import { motion } from 'motion/react';
+import React, { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'motion/react';
 import {
   Code2,
   BrainCircuit,
@@ -8,7 +9,8 @@ import {
   Layers,
   Lightbulb,
   ArrowRight,
-  TerminalSquare
+  TerminalSquare,
+  X
 } from 'lucide-react';
 
 const fadeIn = {
@@ -27,12 +29,79 @@ const staggerContainer = {
 };
 
 export default function App() {
-  const scrollToContact = () => {
-    document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' });
+  const [isLoading, setIsLoading] = useState(true);
+  const [mousePos, setMousePos] = useState({ x: -1000, y: -1000 });
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+    }, 2000);
+    return () => clearTimeout(timer);
+  }, []);
+
+  useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => {
+      setMousePos({ x: e.clientX, y: e.clientY });
+    };
+    window.addEventListener('mousemove', handleMouseMove);
+    return () => window.removeEventListener('mousemove', handleMouseMove);
+  }, []);
+
+  const openContact = (e?: React.MouseEvent) => {
+    e?.preventDefault();
+    setIsModalOpen(true);
   };
 
   return (
-    <div className="min-h-screen bg-[#050505] text-[#F0F0F0] font-sans selection:bg-indigo-500/30 flex flex-col pt-6 pb-6 px-4 md:px-8">
+    <>
+      <AnimatePresence>
+        {isLoading && (
+          <motion.div
+            initial={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.8, ease: "easeInOut" }}
+            className="fixed inset-0 z-[100] bg-[#050505] flex items-center justify-center"
+          >
+            <div className="flex flex-col items-center">
+               <motion.div 
+                 animate={{ scale: [1, 1.2, 1], rotate: [0, 90, 0] }}
+                 transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+                 className="w-16 h-16 bg-indigo-600 rounded-xl flex items-center justify-center mb-6 shadow-[0_0_30px_rgba(79,70,229,0.5)]"
+               >
+                 <span className="font-bold text-white text-3xl">D</span>
+               </motion.div>
+               <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 0.5 }}
+                  className="flex flex-col items-center gap-2"
+               >
+                 <span className="text-white font-bold tracking-widest uppercase text-sm">DevTech</span>
+                 <span className="text-indigo-400 text-[10px] font-mono tracking-[0.2em] uppercase">Iniciando Sistemas</span>
+                 <div className="w-32 h-1 overflow-hidden relative mt-2">
+                   <motion.div 
+                     initial={{ width: 0 }}
+                     animate={{ width: "100%" }}
+                     transition={{ duration: 1.5, ease: "easeInOut" }}
+                     className="absolute inset-y-0 left-0 bg-indigo-500"
+                   />
+                 </div>
+               </motion.div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      <div className="min-h-screen bg-[#050505] text-[#F0F0F0] font-sans selection:bg-indigo-500/30 flex flex-col pt-6 pb-6 px-4 md:px-8 relative overflow-hidden">
+      {/* Background Interactive Glow */}
+      <motion.div 
+        animate={{ x: mousePos.x - 200, y: mousePos.y - 200 }}
+        transition={{ type: "spring", damping: 30, stiffness: 200, mass: 0.5 }}
+        className="fixed top-0 left-0 w-[400px] h-[400px] bg-indigo-500/20 rounded-full blur-[100px] pointer-events-none z-0"
+        style={{ display: mousePos.x === -1000 ? 'none' : 'block' }}
+      />
+      
       {/* Background Effects */}
       <div className="fixed inset-0 z-0 pointer-events-none">
         <div className="absolute top-0 right-1/4 w-[400px] h-[400px] bg-indigo-600/10 rounded-full blur-[120px] mix-blend-screen" />
@@ -54,7 +123,7 @@ export default function App() {
             <a href="#filosofia" className="hover:text-indigo-400 transition-colors">Filosofía</a>
           </nav>
           <button 
-            onClick={scrollToContact}
+            onClick={openContact}
             className="px-5 py-2.5 bg-white text-black text-xs font-bold rounded-full hover:bg-indigo-500 hover:text-white transition-all hover:scale-105"
           >
             HABLEMOS
@@ -184,9 +253,9 @@ export default function App() {
                   <div className="text-[8px] md:text-[9px] text-gray-500 font-bold uppercase tracking-widest mt-1">Escala</div>
                 </div>
               </div>
-              <a href="mailto:contacto@devtech.com" className="group flex items-center justify-center w-12 h-12 md:w-14 md:h-14 bg-black text-white rounded-full hover:bg-indigo-600 transition-all hover:-rotate-12 cursor-pointer shadow-lg mx-auto md:mx-0 shrink-0">
+              <button onClick={openContact} className="group flex items-center justify-center w-12 h-12 md:w-14 md:h-14 bg-black text-white rounded-full hover:bg-indigo-600 transition-all hover:-rotate-12 cursor-pointer shadow-lg mx-auto md:mx-0 shrink-0">
                 <ArrowRight className="w-5 h-5 group-hover:scale-110 transition-transform" />
-              </a>
+              </button>
             </div>
           </motion.div>
         </main>
@@ -201,6 +270,56 @@ export default function App() {
           <span>BUENOS AIRES • MADRID • REMOTE</span>
         </footer>
       </div>
+
+      {/* Contact Modal Layer */}
+      <AnimatePresence>
+        {isModalOpen && (
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[120] flex items-center justify-center p-4 bg-black/60 backdrop-blur-md"
+          >
+            <motion.div 
+              initial={{ scale: 0.95, opacity: 0, y: 20 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={{ scale: 0.95, opacity: 0, y: 20 }}
+              transition={{ type: "spring", damping: 25, stiffness: 300 }}
+              className="bg-[#121214] border border-white/10 rounded-3xl p-8 max-w-md w-full relative overflow-hidden shadow-[0_0_50px_rgba(0,0,0,0.5)]"
+            >
+              <div className="absolute -top-10 -right-10 w-40 h-40 bg-indigo-500/20 blur-3xl rounded-full"></div>
+              
+              <button 
+                onClick={() => setIsModalOpen(false)}
+                className="absolute top-6 right-6 p-2 rounded-full hover:bg-white/10 transition-colors z-10"
+              >
+                <X className="w-5 h-5 text-gray-400" />
+              </button>
+
+              <div className="relative z-10">
+                <h2 className="text-2xl font-bold text-white mb-2">Hablemos de tu proyecto</h2>
+                <p className="text-sm text-gray-400 mb-6">Agenda una cita para descubrir cómo DevTech puede escalar tu negocio.</p>
+                
+                <form className="space-y-4" onSubmit={(e) => { e.preventDefault(); setIsModalOpen(false); }}>
+                  <div>
+                    <input type="text" placeholder="Tu Nombre" className="w-full bg-black/50 border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-indigo-500 transition-colors" required />
+                  </div>
+                  <div>
+                    <input type="email" placeholder="Correo corporativo" className="w-full bg-black/50 border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-indigo-500 transition-colors" required />
+                  </div>
+                  <div>
+                    <textarea placeholder="Cuéntanos brevemente sobre tu reto actual" rows={3} className="w-full bg-black/50 border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-indigo-500 transition-colors resize-none" required></textarea>
+                  </div>
+                  <button type="submit" className="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-sm py-3 rounded-xl transition-colors shadow-lg shadow-indigo-600/20">
+                    CONTACTAR AHORA
+                  </button>
+                </form>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
+    </>
   );
 }
