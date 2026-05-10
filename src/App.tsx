@@ -67,65 +67,65 @@ export default function App() {
           {/* Main Hero Card */}
           <motion.div 
             initial="hidden" animate="visible" variants={staggerContainer}
-            className="md:col-span-7 md:row-span-2 lg:row-span-3 bg-gradient-to-br from-indigo-900/40 to-black border border-white/10 rounded-3xl p-8 md:p-10 flex flex-col justify-end relative overflow-hidden group"
+            className="md:col-span-7 md:row-span-2 lg:row-span-3 bg-gradient-to-br from-indigo-900/40 to-black border border-indigo-500/20 shadow-[inset_0_0_40px_rgba(79,70,229,0.1)] rounded-3xl p-8 md:p-10 flex flex-col justify-end relative overflow-hidden group"
           >
             <div className="absolute top-8 left-8 flex flex-wrap gap-2">
               <span className="px-3 py-1 bg-indigo-500/20 text-indigo-300 text-[10px] rounded-full border border-indigo-500/30 uppercase font-bold tracking-tighter italic">Vibe Coding</span>
               <span className="px-3 py-1 bg-emerald-500/20 text-emerald-300 text-[10px] rounded-full border border-emerald-500/30 uppercase font-bold tracking-tighter">AI Optimized</span>
             </div>
-            <motion.h1 variants={fadeIn} className="text-4xl md:text-5xl lg:text-6xl font-light leading-[1] mt-24 mb-6">
+            <motion.h1 variants={fadeIn} className="text-4xl md:text-5xl lg:text-6xl font-light tracking-tight leading-[1.1] mt-24 mb-6">
               Aceleramos tu <br/>
-              <span className="font-black text-indigo-500 italic">Ventaja Competitiva</span>
+              <span className="font-black text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 via-indigo-500 to-purple-500 italic drop-shadow-sm">Ventaja Competitiva</span>
             </motion.h1>
-            <motion.p variants={fadeIn} className="text-gray-400 max-w-lg text-sm md:text-base leading-relaxed mb-4">
+            <motion.p variants={fadeIn} className="text-gray-300 max-w-lg text-sm md:text-base leading-relaxed mb-4 font-medium">
               Consultora de desarrollo ágil y estrategia tecnológica especializada en optimizar el ciclo de vida del software mediante arquitecturas de Inteligencia Artificial. Transformamos procesos manuales en flujos de trabajo automatizados.
             </motion.p>
           </motion.div>
 
           {/* Next Gen Software Card */}
-          <motion.div variants={fadeIn} className="md:col-span-5 md:row-span-2 bg-[#121214] border border-white/10 rounded-3xl p-6 md:p-8 flex flex-col justify-between hover:bg-white/[0.05] transition-colors relative overflow-hidden group">
-            <div className="absolute -right-4 -bottom-4 w-32 h-32 bg-indigo-500/10 blur-3xl group-hover:bg-indigo-500/20 transition-all rounded-full"></div>
+          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-50px" }} variants={fadeIn} className="md:col-span-5 md:row-span-2 bg-[#121214] border border-white/10 rounded-3xl p-6 md:p-8 flex flex-col justify-between hover:bg-white/[0.05] hover:border-indigo-500/30 hover:shadow-[0_0_30px_rgba(79,70,229,0.15)] transition-all duration-300 relative overflow-hidden group">
+            <div className="absolute -right-4 -bottom-4 w-32 h-32 bg-indigo-500/10 blur-3xl group-hover:bg-indigo-500/30 transition-all duration-500 rounded-full"></div>
             <div className="flex justify-between items-start mb-12 relative z-10">
-              <div className="p-2.5 bg-indigo-500/10 rounded-xl border border-indigo-500/20 group-hover:scale-110 transition-transform">
+              <div className="p-2.5 bg-indigo-500/10 rounded-xl border border-indigo-500/20 group-hover:border-indigo-500/50 group-hover:scale-110 transition-all duration-300 shadow-lg shadow-indigo-500/10">
                 <Code2 className="w-5 h-5 text-indigo-400" />
               </div>
               <span className="text-[10px] font-mono text-indigo-400 uppercase tracking-widest font-bold">Solución 01</span>
             </div>
             <div className="relative z-10">
-              <h3 className="text-xl font-bold mb-2">Software de Nueva Generación</h3>
-              <p className="text-xs md:text-sm text-gray-500 leading-relaxed">
+              <h3 className="text-xl font-bold mb-2 text-white">Software de Nueva Generación</h3>
+              <p className="text-xs md:text-sm text-gray-400 leading-relaxed group-hover:text-gray-300 transition-colors">
                 Implementamos metodologías que integran LLMs para el prototipado rápido, minimizando fricción y maximizando funcionalidad.
               </p>
             </div>
           </motion.div>
 
           {/* AI Optimization Card */}
-          <motion.div variants={fadeIn} id="soluciones" className="md:col-span-5 md:row-span-2 bg-[#121214] border border-white/10 rounded-3xl p-6 md:p-8 flex flex-col justify-between hover:bg-white/[0.05] transition-colors relative overflow-hidden group">
-            <div className="absolute -left-4 -top-4 w-32 h-32 bg-emerald-500/10 blur-3xl group-hover:bg-emerald-500/20 transition-all rounded-full"></div>
+          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-50px" }} variants={fadeIn} id="soluciones" className="md:col-span-5 md:row-span-2 bg-[#121214] border border-white/10 rounded-3xl p-6 md:p-8 flex flex-col justify-between hover:bg-white/[0.05] hover:border-emerald-500/30 hover:shadow-[0_0_30px_rgba(16,185,129,0.15)] transition-all duration-300 relative overflow-hidden group">
+            <div className="absolute -left-4 -top-4 w-32 h-32 bg-emerald-500/10 blur-3xl group-hover:bg-emerald-500/30 transition-all duration-500 rounded-full"></div>
             <div className="flex justify-between items-start mb-12 relative z-10">
-              <div className="p-2.5 bg-emerald-500/10 rounded-xl border border-emerald-500/20 group-hover:scale-110 transition-transform">
+              <div className="p-2.5 bg-emerald-500/10 rounded-xl border border-emerald-500/20 group-hover:border-emerald-500/50 group-hover:scale-110 transition-all duration-300 shadow-lg shadow-emerald-500/10">
                 <BrainCircuit className="w-5 h-5 text-emerald-400" />
               </div>
               <span className="text-[10px] font-mono text-emerald-400 uppercase tracking-widest font-bold">Solución 02</span>
             </div>
             <div className="relative z-10">
-              <h3 className="text-xl font-bold mb-2">Optimización de Procesos IA</h3>
-              <p className="text-xs md:text-sm text-gray-500 leading-relaxed">
+              <h3 className="text-xl font-bold mb-2 text-white">Optimización de Procesos IA</h3>
+              <p className="text-xs md:text-sm text-gray-400 leading-relaxed group-hover:text-gray-300 transition-colors">
                 Diseñamos e integramos soluciones automatizadas que conectan sus operaciones con herramientas de IA para elevar la productividad.
               </p>
             </div>
           </motion.div>
 
           {/* Cloud Card */}
-          <motion.div variants={fadeIn} className="md:col-span-4 md:row-span-2 bg-[#121214] border border-white/10 rounded-3xl p-6 md:p-8 relative overflow-hidden group hover:bg-white/[0.05] transition-colors flex flex-col justify-between">
-            <div className="absolute -right-8 -top-8 w-40 h-40 bg-indigo-500/10 blur-3xl group-hover:bg-indigo-500/20 transition-all rounded-full"></div>
+          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-50px" }} variants={fadeIn} className="md:col-span-4 md:row-span-2 bg-[#121214] border border-white/10 rounded-3xl p-6 md:p-8 relative overflow-hidden group hover:bg-white/[0.05] hover:border-indigo-500/30 hover:shadow-[0_0_30px_rgba(79,70,229,0.1)] transition-all duration-300 flex flex-col justify-between">
+            <div className="absolute -right-8 -top-8 w-40 h-40 bg-indigo-500/10 blur-3xl group-hover:bg-indigo-500/30 transition-all duration-500 rounded-full"></div>
             <div className="relative z-10 flex flex-col h-full justify-between">
               <div>
-                <h3 className="text-lg font-bold mb-2 flex items-center">
+                <h3 className="text-lg font-bold mb-2 flex items-center text-white">
                   <span className="w-2 h-2 bg-indigo-500 rounded-full mr-2 shadow-[0_0_8px_rgba(99,102,241,0.8)]"></span>
                   Modern Cloud
                 </h3>
-                <p className="text-xs md:text-sm text-gray-400 leading-relaxed mb-6">Migración y gestión en entornos seguros, robustos y escalables bajo demanda.</p>
+                <p className="text-xs md:text-sm text-gray-400 group-hover:text-gray-300 transition-colors leading-relaxed mb-6">Migración y gestión en entornos seguros, robustos y escalables bajo demanda.</p>
               </div>
               <div className="flex items-baseline space-x-1.5 align-bottom mt-auto">
                 <span className="text-4xl lg:text-5xl font-mono text-indigo-400 font-bold tracking-tighter">99.9%</span>
@@ -135,29 +135,29 @@ export default function App() {
           </motion.div>
 
           {/* Mentorship Card */}
-          <motion.div variants={fadeIn} className="md:col-span-3 md:row-span-2 bg-[#121214] border border-white/10 rounded-3xl p-6 md:p-8 flex flex-col justify-between hover:bg-white/[0.05] transition-colors group">
+          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-50px" }} variants={fadeIn} className="md:col-span-3 md:row-span-2 bg-[#121214] border border-white/10 rounded-3xl p-6 md:p-8 flex flex-col justify-between hover:bg-white/[0.05] hover:border-gray-600 transition-all duration-300 group">
             <div>
-              <h3 className="text-lg font-bold mb-2 flex items-center gap-2">
-                <Users className="w-4 h-4 text-emerald-400" />
+              <h3 className="text-lg font-bold mb-2 flex items-center gap-2 text-white">
+                <Users className="w-4 h-4 text-emerald-400 group-hover:text-emerald-300 transition-colors" />
                 Mentoría Ejecutiva
               </h3>
-              <p className="text-xs md:text-sm text-gray-400 leading-tight mb-8">Capacitación estratégica para directivos sobre el uso de herramientas tecnológicas emergentes.</p>
+              <p className="text-xs md:text-sm text-gray-400 group-hover:text-gray-300 transition-colors leading-tight mb-8">Capacitación estratégica para directivos sobre el uso de herramientas tecnológicas emergentes.</p>
             </div>
             <div className="mt-auto flex -space-x-2">
-              <div className="w-10 h-10 rounded-full bg-slate-800 border-2 border-[#121214] flex items-center justify-center relative z-20 overflow-hidden">
+              <div className="w-10 h-10 rounded-full bg-slate-800 border-2 border-[#121214] flex items-center justify-center relative z-20 overflow-hidden group-hover:-translate-y-1 transition-transform duration-300">
                 <img src="https://api.dicebear.com/7.x/notionists/svg?seed=Felix&backgroundColor=e2e8f0" alt="Avatar" className="w-full h-full object-cover" />
               </div>
-              <div className="w-10 h-10 rounded-full bg-slate-700 border-2 border-[#121214] flex items-center justify-center relative z-10 overflow-hidden">
+              <div className="w-10 h-10 rounded-full bg-slate-700 border-2 border-[#121214] flex items-center justify-center relative z-10 overflow-hidden group-hover:-translate-y-1 transition-transform duration-300 delay-75">
                 <img src="https://api.dicebear.com/7.x/notionists/svg?seed=Aneka&backgroundColor=c7d2fe" alt="Avatar" className="w-full h-full object-cover" />
               </div>
-              <div className="w-10 h-10 rounded-full bg-indigo-600 border-2 border-[#121214] flex items-center justify-center text-xs font-bold shadow-[0_0_15px_rgba(79,70,229,0.5)] relative z-30">
+              <div className="w-10 h-10 rounded-full bg-indigo-600 border-2 border-[#121214] flex items-center justify-center text-xs font-bold shadow-[0_0_15px_rgba(79,70,229,0.5)] relative z-30 group-hover:-translate-y-1 transition-transform duration-300 delay-150 text-white">
                 +15
               </div>
             </div>
           </motion.div>
 
           {/* Bottom Philosophy Card */}
-          <motion.div variants={fadeIn} id="filosofia" className="md:col-span-12 md:row-span-1 bg-white rounded-3xl p-6 md:p-8 flex flex-col md:flex-row items-center justify-between gap-6 hover:shadow-[0_0_40px_rgba(255,255,255,0.05)] transition-shadow">
+          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-50px" }} variants={fadeIn} id="filosofia" className="md:col-span-12 md:row-span-1 bg-white rounded-3xl p-6 md:p-8 flex flex-col md:flex-row items-center justify-between gap-6 hover:shadow-[0_0_50px_rgba(255,255,255,0.15)] hover:scale-[1.01] transition-all duration-500">
             <div className="flex items-center space-x-6 md:space-x-8">
               <div className="hidden md:flex p-4 bg-indigo-50 rounded-2xl">
                 <TerminalSquare className="w-8 h-8 text-indigo-600" />
