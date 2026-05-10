@@ -66,6 +66,7 @@ export default function App() {
             <nav className="hidden md:flex items-center gap-8 text-sm font-medium tracking-wide">
               <a href="#services" className="hover:text-gray-500 transition-colors uppercase text-[11px] tracking-widest">Soluciones</a>
               <a href="#methodology" className="hover:text-gray-500 transition-colors uppercase text-[11px] tracking-widest">Metodología</a>
+              <a href="#initiatives" className="hover:text-gray-500 transition-colors uppercase text-[11px] tracking-widest">Iniciativas</a>
               <a href="#whyus" className="hover:text-gray-500 transition-colors uppercase text-[11px] tracking-widest">Por Qué DevTech</a>
               <button 
                 onClick={openContact}
@@ -93,6 +94,7 @@ export default function App() {
               <nav className="flex flex-col gap-6 text-2xl font-bold tracking-tighter">
                 <a href="#services" onClick={() => setIsMenuOpen(false)}>Soluciones</a>
                 <a href="#methodology" onClick={() => setIsMenuOpen(false)}>Metodología</a>
+                <a href="#initiatives" onClick={() => setIsMenuOpen(false)}>Iniciativas</a>
                 <a href="#whyus" onClick={() => setIsMenuOpen(false)}>Por Qué DevTech</a>
                 <button onClick={(e) => { setIsMenuOpen(false); openContact(e); }} className="text-left text-blue-600">
                   Contacto
@@ -217,6 +219,76 @@ export default function App() {
                 </motion.div>
               ))}
             </div>
+          </section>
+
+          {/* Initiatives Section */}
+          <section id="initiatives" className="py-24 border-t border-black/10">
+            <motion.h2 
+              initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }}
+              className="text-sm font-bold uppercase tracking-widest mb-16 text-gray-400"
+            >
+              Nuestras Iniciativas
+            </motion.h2>
+
+            <motion.div 
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+               className="bg-[#0a0a0a] text-[#f5f5f4] rounded-3xl p-8 md:p-12 relative overflow-hidden"
+            >
+              <div className="absolute top-0 right-0 w-[400px] h-[400px] bg-emerald-500/20 blur-[100px] rounded-full pointer-events-none"></div>
+              
+              <div className="flex flex-col md:flex-row gap-12 relative z-10">
+                <div className="md:w-1/2 flex flex-col justify-center">
+                    <div className="flex items-center gap-3 mb-6">
+                        <span className="px-4 py-1.5 bg-emerald-500/20 text-emerald-400 text-[10px] font-bold uppercase tracking-widest rounded-full">HealthTech</span>
+                    </div>
+                    <h3 className="text-4xl md:text-5xl font-medium tracking-tight mb-6">MediFlex AI</h3>
+                    <p className="text-gray-400 font-light leading-relaxed mb-8">
+                        Una división desarrollada por DevTech dedicada exclusivamente a transformar el sector salud. Combinamos inteligencia artificial generativa y desarrollo ágil para optimizar la gestión hospitalaria, automatizar procesos médicos y mejorar la atención al paciente.
+                    </p>
+                    <ul className="space-y-4 mb-10">
+                        {[
+                            "Gestión Inteligente de Turnos y Agendas",
+                            "Automatización de Tareas Administrativas",
+                            "Análisis Predictivo de Datos y Triaje",
+                            "Experiencia del Paciente Optimizada"
+                        ].map((feature, i) => (
+                            <li key={i} className="flex items-center gap-4 text-sm text-gray-300">
+                                <div className="w-1.5 h-1.5 rounded-full bg-emerald-500"></div>
+                                {feature}
+                            </li>
+                        ))}
+                    </ul>
+                    <div className="mt-auto">
+                      <button onClick={openContact} className="inline-flex items-center gap-3 text-emerald-400 text-sm font-bold uppercase tracking-widest hover:text-emerald-300 transition-colors group">
+                          Conocer más sobre MediFlex 
+                          <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                      </button>
+                    </div>
+                </div>
+                <div className="md:w-1/2 flex items-center justify-center">
+                   {/* Abstract representation of MediFlex AI */}
+                   <div className="w-full aspect-square md:aspect-auto md:h-full min-h-[300px] bg-gradient-to-br from-emerald-900/40 to-black rounded-2xl border border-white/5 relative overflow-hidden flex flex-col items-center justify-center group">
+                        <div className="absolute inset-0 bg-emerald-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-700"></div>
+                        <div className="relative z-10 flex flex-col items-center gap-6">
+                            <motion.div 
+                                animate={{ y: [0, -10, 0] }}
+                                transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+                                className="w-24 h-24 bg-emerald-500/10 backdrop-blur-xl border border-emerald-500/20 rounded-3xl flex items-center justify-center shadow-[0_0_50px_rgba(16,185,129,0.1)]"
+                            >
+                                <BrainCircuit className="w-12 h-12 text-emerald-400" />
+                            </motion.div>
+                            <div className="flex flex-col items-center gap-2">
+                              <div className="px-4 py-1.5 rounded-full bg-black/50 border border-white/10 backdrop-blur-md font-mono text-emerald-400/70 text-xs">
+                                AI-ASSISTED HEALTHCARE
+                              </div>
+                            </div>
+                        </div>
+                   </div>
+                </div>
+              </div>
+            </motion.div>
           </section>
 
           {/* Why DevTech Section */}
