@@ -7,7 +7,9 @@ import {
   ArrowRight,
   Menu,
   X,
-  Globe
+  Globe,
+  HeartPulse,
+  Sparkles
 } from 'lucide-react';
 
 const fadeIn = {
@@ -107,18 +109,93 @@ export default function App() {
         <main className="flex-1 max-w-7xl mx-auto w-full px-6 pt-32 pb-24 flex flex-col justify-center">
           
           {/* Hero Section */}
-          <section className="min-h-[70vh] flex flex-col justify-center mb-12">
-            <motion.div {...fadeIn} className="max-w-4xl">
-              <h1 className="text-[10vw] md:text-[90px] leading-[1] font-medium tracking-tight mb-8">
+          <section className="min-h-[85vh] flex flex-col lg:flex-row items-center justify-between gap-12 lg:gap-24 mb-12 py-12">
+            <motion.div {...fadeIn} className="max-w-3xl lg:w-1/2 relative z-10 pt-10 lg:pt-0">
+              <h1 className="text-[12vw] sm:text-[10vw] lg:text-[80px] xl:text-[90px] leading-[1] font-medium tracking-tight mb-8">
                 Aceleración Digital
                 <br />
                 <span className="text-gray-400">&</span> Soluciones
                 <br />
                 Inteligentes.
               </h1>
-              <p className="max-w-xl text-lg md:text-xl text-gray-600 leading-relaxed font-light">
+              <p className="max-w-xl text-lg md:text-xl text-gray-600 leading-relaxed font-light mb-12">
                 DevTech es una consultora de desarrollo ágil y estrategia tecnológica especializada en optimizar el ciclo de vida del software mediante Vibe Coding y arquitecturas de Inteligencia Artificial.
               </p>
+              
+              <div className="flex flex-col sm:flex-row items-start sm:items-center gap-6">
+                <button 
+                  onClick={openContact}
+                  className="bg-black text-white px-8 py-4 rounded-full font-bold text-sm tracking-widest uppercase hover:bg-gray-800 transition-all cursor-pointer flex-shrink-0"
+                >
+                  Iniciar Proyecto
+                </button>
+                <div className="flex items-center gap-4 text-xs font-bold text-gray-500 uppercase tracking-widest">
+                  <div className="w-12 h-[1px] bg-black/20"></div>
+                  Construyendo el futuro
+                </div>
+              </div>
+            </motion.div>
+
+            {/* Right Abstract Visual */}
+            <motion.div 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 1.5, delay: 0.3 }}
+              className="hidden lg:flex w-1/2 justify-center lg:justify-end relative"
+            >
+              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] bg-blue-600/10 rounded-full blur-[80px] pointer-events-none"></div>
+              
+              <div className="relative w-full max-w-[500px] aspect-square flex items-center justify-center">
+                {/* Decorative Rings */}
+                <motion.div 
+                  animate={{ rotate: 360 }}
+                  transition={{ duration: 50, repeat: Infinity, ease: "linear" }}
+                  className="absolute inset-[10%] rounded-full border border-dashed border-black/10"
+                />
+                <motion.div 
+                  animate={{ rotate: -360 }}
+                  transition={{ duration: 40, repeat: Infinity, ease: "linear" }}
+                  className="absolute inset-[25%] rounded-full border border-black/10 flex items-start justify-center"
+                >
+                  <div className="w-2.5 h-2.5 bg-blue-600 rounded-full -mt-[5px] shadow-[0_0_15px_rgba(37,99,235,0.5)]"></div>
+                </motion.div>
+
+                {/* Core Sphere */}
+                <div className="w-32 h-32 bg-black rounded-full shadow-2xl flex items-center justify-center relative z-20">
+                  <BrainCircuit className="w-12 h-12 text-white rotate-90" />
+                  <div className="absolute inset-0 rounded-full border border-white/20"></div>
+                </div>
+
+                {/* Floating Cards */}
+                <motion.div 
+                  animate={{ y: [-15, 5, -15] }}
+                  transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
+                  className="absolute top-[15%] left-0 bg-white/90 backdrop-blur-xl p-4 rounded-2xl shadow-xl border border-black/5 flex items-center gap-4 z-30"
+                >
+                  <div className="p-3 bg-blue-50 rounded-xl text-blue-600">
+                    <Code2 className="w-6 h-6" />
+                  </div>
+                  <div className="pr-2">
+                    <div className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Metodología</div>
+                    <div className="text-sm font-bold text-black tracking-tight">Vibe Coding</div>
+                  </div>
+                </motion.div>
+
+                <motion.div 
+                  animate={{ y: [15, -5, 15] }}
+                  transition={{ duration: 7, repeat: Infinity, ease: "easeInOut", delay: 1 }}
+                  className="absolute bottom-[20%] right-[-10%] bg-white/90 backdrop-blur-xl p-4 rounded-2xl shadow-xl border border-black/5 flex items-center gap-4 z-30"
+                >
+                  <div className="p-3 bg-[#0a0a0a] rounded-xl text-white">
+                    <Database className="w-6 h-6" />
+                  </div>
+                  <div className="pr-2">
+                    <div className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Arquitectura</div>
+                    <div className="text-sm font-bold text-black tracking-tight">Cloud Native</div>
+                  </div>
+                </motion.div>
+
+              </div>
             </motion.div>
           </section>
 
@@ -134,7 +211,7 @@ export default function App() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-16">
               {[
                 { title: "Software de Nueva Generación", description: "Implementamos metodologías que integran LLMs para el prototipado y despliegue rápido de aplicaciones personalizadas, minimizando la fricción técnica.", icon: <Code2 className="w-6 h-6" /> },
-                { title: "Optimización de Procesos con IA", description: "Diseñamos e integramos soluciones de automatización (SaaS) que conectan operaciones actuales con herramientas de IA para elevar la productividad.", icon: <BrainCircuit className="w-6 h-6" /> },
+                { title: "Optimización de Procesos con IA", description: "Diseñamos e integramos soluciones de automatización (SaaS) que conectan operaciones actuales con herramientas de IA para elevar la productividad.", icon: <BrainCircuit className="w-6 h-6 rotate-90" /> },
                 { title: "Arquitecturas Modernas & Cloud", description: "Consultoría en la migración y gestión de infraestructura en la nube, garantizando entornos seguros, robustos y preparados para crecer bajo demanda.", icon: <Database className="w-6 h-6" /> },
                 { title: "Mentoría Ejecutiva en TI", description: "Capacitamos a cuadros directivos y técnicos en el uso estratégico de herramientas emergentes, asegurando resultados medibles de la inversión.", icon: <Globe className="w-6 h-6" /> }
               ].map((service, idx) => (
@@ -277,7 +354,10 @@ export default function App() {
                                 transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
                                 className="w-24 h-24 bg-emerald-500/10 backdrop-blur-xl border border-emerald-500/20 rounded-3xl flex items-center justify-center shadow-[0_0_50px_rgba(16,185,129,0.1)]"
                             >
-                                <BrainCircuit className="w-12 h-12 text-emerald-400" />
+                                <div className="relative">
+                                  <HeartPulse className="w-12 h-12 text-emerald-400" />
+                                  <Sparkles className="w-5 h-5 text-emerald-200 absolute -top-1 -right-2" />
+                                </div>
                             </motion.div>
                             <div className="flex flex-col items-center gap-2">
                               <div className="px-4 py-1.5 rounded-full bg-black/50 border border-white/10 backdrop-blur-md font-mono text-emerald-400/70 text-xs">
