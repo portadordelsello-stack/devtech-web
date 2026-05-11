@@ -83,6 +83,7 @@ export default function Landing({ user }: { user: any }) {
               <a href="#services" className="hover:text-gray-500 transition-colors uppercase text-[11px] tracking-widest">Soluciones</a>
               <a href="#methodology" className="hover:text-gray-500 transition-colors uppercase text-[11px] tracking-widest">Metodología</a>
               <a href="#initiatives" className="hover:text-gray-500 transition-colors uppercase text-[11px] tracking-widest">Iniciativas</a>
+              <a href="#capacitaciones" className="hover:text-gray-500 transition-colors uppercase text-[11px] tracking-widest">Academia</a>
               <a href="#whyus" className="hover:text-gray-500 transition-colors uppercase text-[11px] tracking-widest">Por Qué DevTech</a>
               <button 
                 onClick={handleLogin}
@@ -111,6 +112,7 @@ export default function Landing({ user }: { user: any }) {
                 <a href="#services" onClick={() => setIsMenuOpen(false)}>Soluciones</a>
                 <a href="#methodology" onClick={() => setIsMenuOpen(false)}>Metodología</a>
                 <a href="#initiatives" onClick={() => setIsMenuOpen(false)}>Iniciativas</a>
+                <a href="#capacitaciones" onClick={() => setIsMenuOpen(false)}>Academia</a>
                 <a href="#whyus" onClick={() => setIsMenuOpen(false)}>Por Qué DevTech</a>
                 <button onClick={() => { setIsMenuOpen(false); handleLogin(); }} className="text-left text-indigo-600">
                   {user ? 'Panel de Control' : 'Consola'}
@@ -383,6 +385,57 @@ export default function Landing({ user }: { user: any }) {
                 </div>
               </div>
             </motion.div>
+          </section>
+
+          {/* Capacitaciones Section */}
+          <section id="capacitaciones" className="py-10 md:py-16 border-t border-black/10">
+            <div className="flex flex-col md:flex-row gap-8 md:gap-12 lg:gap-24 items-center">
+              <motion.div 
+                initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }}
+                className="md:w-1/2"
+              >
+                <div className="flex items-center gap-3 mb-6">
+                  <span className="px-4 py-1.5 bg-blue-100 text-blue-700 text-[10px] font-bold uppercase tracking-widest rounded-full">Workshops & Capacitaciones</span>
+                </div>
+                <h3 className="text-4xl md:text-5xl font-medium tracking-tight mb-6">
+                  CCA VibeCoding.
+                </h3>
+                <p className="text-xl text-gray-600 leading-relaxed font-light mb-8">
+                  Descubrí cómo potenciar tu negocio creando soluciones reales con Inteligencia Artificial, sin necesidad de saber programar.
+                </p>
+                <button 
+                  onClick={() => navigate('/workshop')}
+                  className="bg-black text-white px-8 py-4 rounded-full font-bold text-sm tracking-widest uppercase hover:bg-gray-800 transition-all flex items-center gap-3"
+                >
+                  Conocer Workshop <ArrowRight className="w-4 h-4" />
+                </button>
+              </motion.div>
+
+              <motion.div 
+                initial={{ opacity: 0, scale: 0.95 }}
+                whileInView={{ opacity: 1, scale: 1 }}
+                viewport={{ once: true }}
+                className="md:w-1/2 w-full"
+              >
+                <div className="bg-white rounded-3xl p-8 border border-black/10 shadow-lg relative overflow-hidden flex flex-col justify-between min-h-[300px]">
+                  <div className="absolute top-[-50px] right-[-50px] w-48 h-48 bg-blue-50 rounded-full blur-3xl"></div>
+                  
+                  <div className="relative z-10">
+                    <div className="w-12 h-12 bg-black rounded-xl mb-6 flex items-center justify-center">
+                      <BrainCircuit className="w-6 h-6 text-white" />
+                    </div>
+                    <h4 className="text-2xl font-bold mb-4">Alfabetización tecnológica aplicada.</h4>
+                    <p className="text-gray-500 mb-6 font-light">Workshop intensivo de 2 encuentros diseñado para emprendedores y profesionales.</p>
+                  </div>
+                  
+                  <div className="relative z-10 flex gap-4 text-xs font-bold text-gray-400 uppercase tracking-widest">
+                    <span>100% Práctico</span>
+                    <span>•</span>
+                    <span>Sin experiencia previa</span>
+                  </div>
+                </div>
+              </motion.div>
+            </div>
           </section>
 
           {/* Why DevTech Section */}

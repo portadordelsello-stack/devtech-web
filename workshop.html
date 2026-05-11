@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="es" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CCA VibeCoding</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+          },
+          keyframes: {
+            fadeInUp: {
+              '0%': { opacity: '0', transform: 'translateY(20px)' },
+              '100%': { opacity: '1', transform: 'translateY(0)' },
+            },
+            scaleIn: {
+              '0%': { opacity: '0', transform: 'scale(0.9) translateX(-20px)' },
+              '100%': { opacity: '1', transform: 'scale(1) translateX(0)' },
+            }
+          },
+          animation: {
+            'fade-in-up': 'fadeInUp 0.7s ease-out forwards',
+            'scale-in': 'scaleIn 0.7s ease-out forwards',
+          }
+        }
+      }
+    }
+  </script>
+  
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <style type="text/tailwindcss">
+    @layer utilities {
+      .opacity-0 {
+        opacity: 0;
+      }
+    }
+  </style>
+</head>
+<body class="min-h-screen bg-[#F8F9FA] font-sans text-slate-900 selection:bg-slate-200 selection:text-slate-900 flex flex-col relative overflow-x-hidden">
+
+  <nav class="px-6 md:px-12 py-6 flex justify-between items-center relative z-50">
+    <div class="flex items-center gap-3">
+      <div class="w-8 h-8 md:w-10 md:h-10 rounded-xl bg-black flex items-center justify-center">
+        <i data-lucide="bot" class="w-5 h-5 md:w-6 md:h-6 text-white"></i>
+      </div>
+      <span class="text-xl md:text-2xl font-bold tracking-tight text-black">CCA VibeCoding.</span>
+    </div>
+
+    <div class="hidden lg:flex items-center gap-8">
+      <a href="#como-funciona" class="text-[11px] font-semibold tracking-widest uppercase text-black hover:text-slate-600 transition-colors">¿Qué es?</a>
+      <a href="#ejemplos" class="text-[11px] font-semibold tracking-widest uppercase text-black hover:text-slate-600 transition-colors">Ejemplos</a>
+      <a href="#para-quien" class="text-[11px] font-semibold tracking-widest uppercase text-black hover:text-slate-600 transition-colors">¿Para quién?</a>
+      <a href="#metodologia" class="text-[11px] font-semibold tracking-widest uppercase text-black hover:text-slate-600 transition-colors">Programa</a>
+    </div>
+
+    <div>
+      <a href="#registro" class="bg-black hover:bg-slate-800 text-white text-[11px] font-bold tracking-widest uppercase px-6 py-3 rounded-full transition-all">
+        Reservá tu lugar
+      </a>
+    </div>
+  </nav>
+
+  <section class="relative pt-12 md:pt-24 pb-20 md:pb-32 px-6 md:px-12 border-b border-slate-200 bg-[#F8F9FA] overflow-hidden">
+    <div class="max-w-7xl mx-auto grid lg:grid-cols-2 gap-12 items-center">
+      <div class="z-10 relative">
+        <div class="opacity-0 animate-fade-in-up inline-flex items-center gap-2 mb-6 md:mb-8 px-4 py-2 rounded-full border border-slate-200 bg-white text-black font-bold text-xs shadow-sm">
+          <i data-lucide="sparkles" class="w-4 h-4"></i>
+          <span>Workshop Sin Costo • Cupos Limitados • 2 Encuentros</span>
+        </div>
+
+        <h1 class="opacity-0 animate-fade-in-up text-5xl sm:text-6xl md:text-[5rem] font-extrabold text-black leading-[0.95] tracking-tight mb-8">
+          Creá soluciones<br>
+          reales con<br>
+          <span class="text-slate-400 font-semibold">Inteligencia</span><br>
+          Artificial.
+        </h1>
+
+        <p class="opacity-0 animate-fade-in-up text-xl md:text-2xl text-slate-800 font-medium max-w-xl leading-relaxed mb-4">
+          Traé una idea o un problema de tu negocio. Salí con una solución funcionando.
+        </p>
+
+        <p class="opacity-0 animate-fade-in-up text-lg md:text-xl text-slate-500 max-w-xl leading-relaxed mb-10">
+          Descubrí cómo personas sin experiencia técnica están creando páginas web, automatizaciones y herramientas digitales usando lenguaje natural e Inteligencia Artificial.
+        </p>
+
+        <div class="flex flex-col sm:flex-row gap-4">
+          <a href="#registro" class="bg-black text-white px-8 py-5 rounded-full font-bold uppercase tracking-widest text-[12px] text-center hover:bg-slate-800 transition-all">
+            Reservá tu lugar
+          </a>
+
+          <a href="#ejemplos" class="border border-slate-300 bg-white px-8 py-5 rounded-full font-bold uppercase tracking-widest text-[12px] text-center hover:border-black transition-all">
+            Ver ejemplos
+          </a>
+        </div>
+
+        <div class="mt-10 flex flex-wrap gap-4 text-sm text-slate-500 font-medium">
+          <div class="bg-white border border-slate-200 px-4 py-2 rounded-full">Sin conocimientos previos</div>
+          <div class="bg-white border border-slate-200 px-4 py-2 rounded-full">Resultados en vivo</div>
+          <div class="bg-white border border-slate-200 px-4 py-2 rounded-full">Herramientas reales</div>
+        </div>
+      </div>
+
+      <div class="relative hidden lg:flex justify-center items-center h-full min-h-[500px]">
+        <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
+          <div class="w-[400px] h-[400px] rounded-full border border-slate-200 absolute"></div>
+          <div class="w-[600px] h-[600px] rounded-full border border-slate-200 absolute opacity-50"></div>
+          <div class="w-[800px] h-[800px] rounded-full border border-slate-200 absolute opacity-20"></div>
+
+          <div class="w-48 h-48 rounded-full bg-black shadow-[0_0_80px_rgba(0,0,0,0.15)] flex items-center justify-center relative z-10 translate-x-12 translate-y-24">
+            <i data-lucide="globe-2" class="w-16 h-16 text-white opacity-80" stroke-width="1.5"></i>
+          </div>
+        </div>
+
+        <div class="opacity-0 animate-scale-in bg-white rounded-2xl p-6 shadow-[0_8px_30px_rgba(0,0,0,0.06)] flex items-center gap-5 relative z-20 -translate-x-20 -translate-y-16">
+          <div class="w-14 h-14 rounded-2xl bg-[#F8F9FA] flex flex-col justify-center items-center text-slate-800 border border-slate-200">
+            <i data-lucide="bot" class="w-7 h-7" stroke-width="1.5"></i>
+          </div>
+          <div>
+            <span class="block text-[10px] font-bold tracking-widest uppercase text-slate-400 mb-1">Vibe Coding</span>
+            <span class="block text-lg font-bold text-black leading-none">Creá hablando con IA</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="py-12 px-6 md:px-12 bg-white border-b border-slate-200">
+    <div class="max-w-5xl mx-auto text-center">
+      <p class="text-2xl md:text-3xl font-bold text-black leading-relaxed tracking-tight">
+        No se trata de magia ni de reemplazar personas.
+      </p>
+      <p class="text-lg md:text-xl text-slate-500 leading-relaxed mt-4 max-w-3xl mx-auto">
+        Se trata de usar herramientas modernas para resolver problemas reales más rápido, reducir tareas repetitivas y potenciar lo que ya hacés.
+      </p>
+    </div>
+  </section>
+
+  <section class="py-20 md:py-24 px-6 md:px-12 bg-white" id="ejemplos">
+    <div class="max-w-7xl mx-auto">
+      <h2 class="text-[11px] font-bold tracking-widest uppercase text-slate-400 mb-6">
+        Ejemplos reales
+      </h2>
+
+      <h3 class="text-4xl md:text-5xl font-bold tracking-tight text-black max-w-3xl leading-[1.1] mb-12">
+        Lo que hoy podés crear con IA usando lenguaje natural.
+      </h3>
+
+      <div class="grid md:grid-cols-3 gap-6">
+        <div class="bg-[#F8F9FA] border border-slate-200 rounded-3xl p-8">
+          <div class="aspect-video rounded-2xl bg-white border border-slate-200 mb-6 flex items-center justify-center text-slate-400 text-sm font-semibold">
+            Landing Page
+          </div>
+          <p class="text-sm uppercase tracking-widest text-slate-400 font-bold mb-3">Idea → Resultado</p>
+          <h4 class="text-2xl font-bold text-black mb-4">Página para un emprendimiento</h4>
+          <p class="text-slate-500 leading-relaxed">
+            Una persona describe su negocio en lenguaje natural y obtiene una web moderna lista para mostrar servicios o vender productos.
+          </p>
+        </div>
+
+        <div class="bg-[#F8F9FA] border border-slate-200 rounded-3xl p-8">
+          <div class="aspect-video rounded-2xl bg-white border border-slate-200 mb-6 flex items-center justify-center text-slate-400 text-sm font-semibold">
+            Sistema de Turnos
+          </div>
+          <p class="text-sm uppercase tracking-widest text-slate-400 font-bold mb-3">Problema → Solución</p>
+          <h4 class="text-2xl font-bold text-black mb-4">Organización automatizada</h4>
+          <p class="text-slate-500 leading-relaxed">
+            Dejar atrás cuadernos, mensajes desordenados y tareas repetitivas creando herramientas simples adaptadas al negocio.
+          </p>
+        </div>
+
+        <div class="bg-[#F8F9FA] border border-slate-200 rounded-3xl p-8">
+          <div class="aspect-video rounded-2xl bg-white border border-slate-200 mb-6 flex items-center justify-center text-slate-400 text-sm font-semibold">
+            Catálogo QR
+          </div>
+          <p class="text-sm uppercase tracking-widest text-slate-400 font-bold mb-3">Prompt → App</p>
+          <h4 class="text-2xl font-bold text-black mb-4">Herramientas listas en minutos</h4>
+          <p class="text-slate-500 leading-relaxed">
+            Verás cómo asistentes de IA generan estructuras funcionales en tiempo real mientras interactuás con ellos.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="py-20 md:py-24 px-6 md:px-12 bg-[#F8F9FA]" id="como-funciona">
+    <div class="max-w-7xl mx-auto">
+      <h2 class="text-[11px] font-bold tracking-widest uppercase text-slate-400 mb-12 md:mb-16">
+        ¿Qué podés crear para tu negocio?
+      </h2>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-16">
+        <div class="group cursor-default">
+          <i data-lucide="shopping-bag" class="w-8 h-8 text-black mb-8 opacity-70" stroke-width="1.5"></i>
+          <h3 class="text-2xl font-bold text-black mb-4 tracking-tight">Catálogos y Tiendas Online</h3>
+          <p class="text-slate-500 text-lg leading-relaxed mb-8">
+            Creá menús QR, tiendas web y catálogos digitales para mostrar productos y captar clientes.
+          </p>
+          <div class="w-12 h-[1px] bg-slate-300 group-hover:w-full transition-all duration-500"></div>
+        </div>
+
+        <div class="group cursor-default">
+          <i data-lucide="layout-dashboard" class="w-8 h-8 text-black mb-8 opacity-70" stroke-width="1.5"></i>
+          <h3 class="text-2xl font-bold text-black mb-4 tracking-tight">Sistemas para tu Negocio</h3>
+          <p class="text-slate-500 text-lg leading-relaxed mb-8">
+            Organizá ventas, clientes, turnos e inventario sin depender de herramientas complejas.
+          </p>
+          <div class="w-12 h-[1px] bg-slate-300 group-hover:w-full transition-all duration-500"></div>
+        </div>
+
+        <div class="group cursor-default">
+          <i data-lucide="message-square-more" class="w-8 h-8 text-black mb-8 opacity-70" stroke-width="1.5"></i>
+          <h3 class="text-2xl font-bold text-black mb-4 tracking-tight">Automatización de Tareas</h3>
+          <p class="text-slate-500 text-lg leading-relaxed mb-8">
+            Ahorrá tiempo automatizando respuestas frecuentes, formularios y procesos repetitivos.
+          </p>
+          <div class="w-12 h-[1px] bg-slate-300 group-hover:w-full transition-all duration-500"></div>
+        </div>
+
+        <div class="group cursor-default">
+          <i data-lucide="globe-2" class="w-8 h-8 text-black mb-8 opacity-70" stroke-width="1.5"></i>
+          <h3 class="text-2xl font-bold text-black mb-4 tracking-tight">Páginas Web Profesionales</h3>
+          <p class="text-slate-500 text-lg leading-relaxed mb-8">
+            Lanzá páginas modernas para mostrar qué hacés, generar confianza y aumentar presencia online.
+          </p>
+          <div class="w-12 h-[1px] bg-slate-300 group-hover:w-full transition-all duration-500"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="py-20 md:py-24 px-6 md:px-12 bg-white" id="para-quien">
+    <div class="max-w-7xl mx-auto grid lg:grid-cols-2 gap-12 items-start">
+      <div>
+        <h2 class="text-[11px] font-bold tracking-widest uppercase text-slate-400 mb-6">
+          ¿Para quién es?
+        </h2>
+
+        <h3 class="text-4xl md:text-5xl font-bold text-black leading-[1.1] tracking-tight mb-8 max-w-2xl">
+          Tecnología accesible para personas reales.
+        </h3>
+
+        <p class="text-xl text-slate-600 leading-relaxed max-w-2xl">
+          Este workshop fue pensado para personas curiosas que quieren aprovechar la IA sin necesidad de convertirse en programadores.
+        </p>
+      </div>
+
+      <div class="grid sm:grid-cols-2 gap-4">
+        <div class="bg-[#F8F9FA] border border-slate-200 rounded-2xl p-6">
+          <h4 class="font-bold text-black mb-3">Emprendedores</h4>
+          <p class="text-slate-500">Personas que quieren crecer digitalmente sin grandes costos iniciales.</p>
+        </div>
+
+        <div class="bg-[#F8F9FA] border border-slate-200 rounded-2xl p-6">
+          <h4 class="font-bold text-black mb-3">Comercios</h4>
+          <p class="text-slate-500">Negocios que buscan organizar procesos y mejorar atención al cliente.</p>
+        </div>
+
+        <div class="bg-[#F8F9FA] border border-slate-200 rounded-2xl p-6">
+          <h4 class="font-bold text-black mb-3">Profesionales Independientes</h4>
+          <p class="text-slate-500">Turnos, formularios, automatización y presencia online simplificada.</p>
+        </div>
+
+        <div class="bg-[#F8F9FA] border border-slate-200 rounded-2xl p-6">
+          <h4 class="font-bold text-black mb-3">Personas Sin Experiencia Técnica</h4>
+          <p class="text-slate-500">Ideal si sentís que la tecnología parece complicada o lejana.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="py-20 md:py-24 px-6 md:px-12 bg-[#F8F9FA] relative" id="metodologia">
+    <div class="max-w-7xl mx-auto">
+      <h2 class="text-[11px] font-bold tracking-widest uppercase text-slate-400 mb-12 md:mb-16">
+        Estructura del Workshop
+      </h2>
+
+      <div class="grid md:grid-cols-2 gap-12 items-start">
+        <div>
+          <h3 class="text-4xl md:text-5xl font-bold text-black leading-[1.1] tracking-tight mb-6">
+            Vibe Coding explicado simple.
+          </h3>
+
+          <p class="text-xl text-slate-800 font-medium leading-relaxed mb-4">
+            Crear herramientas digitales usando lenguaje natural e Inteligencia Artificial.
+          </p>
+
+          <p class="text-lg text-slate-600 leading-relaxed max-w-lg mb-8">
+            En lugar de escribir código complejo desde cero, aprendés a comunicar ideas y objetivos a asistentes de IA para acelerar la creación de soluciones reales.
+          </p>
+
+          <div class="flex items-start gap-4 bg-white p-5 rounded-2xl border border-slate-200 shadow-[0_8px_30px_rgba(0,0,0,0.04)] max-w-sm">
+            <div class="w-8 h-8 rounded-full bg-slate-50 flex items-center justify-center shrink-0 border border-slate-100">
+              <i data-lucide="check-circle-2" class="w-4 h-4 text-black"></i>
+            </div>
+            <p class="font-medium text-slate-700 text-sm mt-1">100% pensado para personas sin conocimientos técnicos previos.</p>
+          </div>
+        </div>
+
+        <div class="space-y-12">
+          <div class="relative pl-10">
+            <div class="absolute left-0 top-0 w-8 h-8 flex items-center justify-center">
+              <span class="w-[1px] h-full bg-slate-300 absolute top-8 bottom-[-24px] left-1/2 -translate-x-1/2"></span>
+              <span class="w-2 h-2 rounded-full bg-black relative z-10"></span>
+            </div>
+            <h4 class="text-xl font-bold text-black mb-2 -mt-1">1. Diagnóstico y Posibilidades</h4>
+            <p class="text-slate-500 text-lg leading-relaxed">
+              Encuentro 1 (1:30 hs): descubrimos herramientas accesibles, analizamos tareas repetitivas y aprendemos a escribir instrucciones efectivas para IA.
+            </p>
+          </div>
+
+          <div class="relative pl-10">
+            <div class="absolute left-0 top-0 w-8 h-8 flex items-center justify-center">
+              <span class="w-[1px] h-full bg-slate-300 absolute top-8 bottom-[-24px] left-1/2 -translate-x-1/2"></span>
+              <span class="w-2 h-2 rounded-full bg-black relative z-10"></span>
+            </div>
+            <h4 class="text-xl font-bold text-black mb-2 -mt-1">2. Diseño de la Solución</h4>
+            <p class="text-slate-500 text-lg leading-relaxed">
+              Definimos juntos qué necesita cada persona: una web, un sistema de turnos, automatizaciones o herramientas internas.
+            </p>
+          </div>
+
+          <div class="relative pl-10">
+            <div class="absolute left-0 top-0 w-8 h-8 flex items-center justify-center">
+              <span class="w-2 h-2 rounded-full bg-black relative z-10"></span>
+            </div>
+            <h4 class="text-xl font-bold text-black mb-2 -mt-1">3. Creación en Vivo</h4>
+            <p class="text-slate-500 text-lg leading-relaxed">
+              Encuentro 2 (1:30 hs): interactuamos con agentes de IA y vemos soluciones funcionales aparecer en tiempo real.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="py-20 md:py-24 px-6 md:px-12 bg-black text-white text-center">
+    <div class="max-w-4xl mx-auto">
+      <p class="text-[11px] uppercase tracking-widest font-bold text-slate-400 mb-6">
+        Resultado esperado
+      </p>
+
+      <h2 class="text-4xl md:text-6xl font-bold leading-[1.05] tracking-tight mb-8">
+        Que descubras que sí podés crear.
+      </h2>
+
+      <p class="text-xl md:text-2xl text-slate-300 leading-relaxed max-w-3xl mx-auto mb-12">
+        La meta no es que memorices teoría. La meta es que experimentes cómo una idea puede transformarse en una herramienta útil para tu vida o negocio.
+      </p>
+
+      <a href="#registro" class="inline-flex bg-white text-black px-10 py-5 rounded-full font-bold uppercase tracking-widest text-[12px] hover:bg-slate-200 transition-all">
+        Quiero participar
+      </a>
+    </div>
+  </section>
+
+  <section class="py-20 md:py-24 px-6 md:px-12 bg-white" id="registro">
+    <div class="max-w-7xl mx-auto grid lg:grid-cols-2 gap-12 md:gap-16 items-start">
+      <div class="sticky top-32">
+        <h2 class="text-[11px] font-bold tracking-widest uppercase text-slate-400 mb-6">
+          Inscripción
+        </h2>
+
+        <h3 class="text-4xl sm:text-5xl md:text-6xl font-bold text-black leading-[1.05] tracking-tight mb-8">
+          Tu idea, funcionando.
+        </h3>
+
+        <p class="text-xl text-slate-600 leading-relaxed mb-10">
+          Workshop inicial totalmente <span class="font-bold text-black">sin costo</span> y con grupos reducidos para acompañamiento personalizado.
+        </p>
+
+        <div class="grid grid-cols-2 gap-4 md:gap-6 mt-8">
+          <div class="bg-[#F8F9FA] border border-slate-200 p-6 rounded-2xl shadow-sm text-center flex flex-col justify-center">
+            <span class="block text-4xl font-bold text-black mb-2">0%</span>
+            <span class="text-[10px] uppercase tracking-widest font-bold text-slate-500">Código previo</span>
+          </div>
+
+          <div class="bg-[#F8F9FA] border border-slate-200 p-6 rounded-2xl shadow-sm text-center flex flex-col justify-center">
+            <span class="block text-4xl font-bold text-black mb-2">100%</span>
+            <span class="text-[10px] uppercase tracking-widest font-bold text-slate-500">Práctico</span>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <div class="bg-[#F8F9FA] border border-slate-200 rounded-[2rem] p-8 md:p-12">
+          <div class="mb-10">
+            <h4 class="text-2xl font-bold text-black tracking-tight">Reservá tu lugar</h4>
+            <p class="text-slate-500 mt-2 text-lg">Completá el formulario y contanos qué desafío querés resolver.</p>
+          </div>
+
+          <div id="success-message" class="hidden text-center py-12">
+            <div class="w-20 h-20 bg-white border border-slate-200 rounded-full flex items-center justify-center mx-auto mb-8 shadow-sm">
+              <i data-lucide="check-circle-2" class="w-10 h-10 text-black"></i>
+            </div>
+            <h3 class="text-3xl font-bold mb-4 text-black tracking-tight">¡Solicitud enviada!</h3>
+            <p class="text-slate-600 text-lg">
+              Pronto nos pondremos en contacto con más información del workshop.
+            </p>
+          </div>
+
+          <div id="form-container">
+            <form onsubmit="handleSubmit(event)" class="space-y-6">
+              <div>
+                <label for="name" class="block text-sm font-bold text-black mb-3">Nombre completo</label>
+                <input type="text" id="name" required class="w-full bg-white border border-slate-200 text-black px-5 py-4 rounded-xl focus:outline-none focus:ring-1 focus:ring-black focus:border-black transition-all placeholder:text-slate-400" placeholder="Tu nombre">
+              </div>
+
+              <div>
+                <label for="email" class="block text-sm font-bold text-black mb-3">Correo electrónico</label>
+                <input type="email" id="email" required class="w-full bg-white border border-slate-200 text-black px-5 py-4 rounded-xl focus:outline-none focus:ring-1 focus:ring-black focus:border-black transition-all placeholder:text-slate-400" placeholder="hola@ejemplo.com">
+              </div>
+
+              <div>
+                <label for="whatsapp" class="block text-sm font-bold text-black mb-3">WhatsApp</label>
+                <input type="tel" id="whatsapp" required class="w-full bg-white border border-slate-200 text-black px-5 py-4 rounded-xl focus:outline-none focus:ring-1 focus:ring-black focus:border-black transition-all placeholder:text-slate-400" placeholder="Tu número de contacto">
+              </div>
+
+              <div>
+                <label for="problem" class="block text-base font-bold text-black mb-3">
+                  ¿Qué tarea o problema te gustaría resolver con IA?
+                </label>
+
+                <textarea id="problem" required rows="4" class="w-full bg-white border border-slate-200 text-black px-5 py-4 rounded-xl focus:outline-none focus:ring-1 focus:ring-black focus:border-black transition-all resize-none placeholder:text-slate-400" placeholder='Ej: “Pierdo tiempo respondiendo mensajes”, “No tengo página web”, “Quiero organizar turnos o pedidos”'></textarea>
+              </div>
+
+              <button type="submit" class="w-full bg-black text-white font-bold text-[13px] tracking-widest uppercase py-5 rounded-full hover:bg-slate-800 transition-all mt-8 flex justify-center items-center gap-3">
+                Quiero participar
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer class="py-12 px-6 md:px-12 bg-white border-t border-slate-200">
+    <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-6">
+      <div class="flex items-center gap-3">
+        <div class="w-8 h-8 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-center">
+          <i data-lucide="bot" class="w-4 h-4 text-slate-400"></i>
+        </div>
+
+        <span class="text-xl font-bold tracking-tight text-black">CCA VibeCoding.</span>
+      </div>
+
+      <div class="text-[11px] uppercase tracking-widest font-semibold text-slate-400 text-center flex flex-col md:flex-row items-center gap-2 md:gap-6">
+        <span>Alfabetización tecnológica aplicada.</span>
+        <span class="hidden md:inline">•</span>
+        <span>Workshop 2026</span>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    lucide.createIcons();
+
+    function handleSubmit(event) {
+      event.preventDefault();
+      document.getElementById('form-container').classList.add('hidden');
+      document.getElementById('success-message').classList.remove('hidden');
+    }
+  </script>
+</body>
+</html>

@@ -5,7 +5,6 @@ import { Link } from 'react-router-dom';
 import { handleFirestoreError, OperationType } from '../lib/firestoreUtils';
 import { LogOut, Plus, Settings, Briefcase, FileText } from 'lucide-react';
 import { ChatModal } from '../components/ChatModal';
-import { AdminModal } from '../components/AdminModal'; // I will refactor to just show inline
 
 export default function Dashboard({ user }: { user: any }) {
   const isAdmin = user?.email === 'portadordelsello@gmail.com';

@@ -3,6 +3,7 @@ import { Routes, Route, Navigate } from 'react-router-dom';
 import Landing from './pages/Landing';
 import Dashboard from './pages/Dashboard';
 import ProjectDetail from './pages/ProjectDetail';
+import Workshop from './pages/Workshop';
 import { onAuthStateChanged, User } from 'firebase/auth';
 import { auth } from './firebase';
 
@@ -25,6 +26,7 @@ export default function App() {
   return (
     <Routes>
       <Route path="/" element={<Landing user={user} />} />
+      <Route path="/workshop" element={<Workshop user={user} />} />
       <Route path="/dashboard" element={user ? <Dashboard user={user} /> : <Navigate to="/" />} />
       <Route path="/project/:id" element={user ? <ProjectDetail user={user} /> : <Navigate to="/" />} />
     </Routes>
