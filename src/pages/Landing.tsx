@@ -120,7 +120,7 @@ export default function Landing({ user }: { user: any }) {
           )}
         </AnimatePresence>
 
-        <main className="flex-1 max-w-7xl mx-auto w-full px-6 pt-32 pb-24 flex flex-col justify-center">
+        <main className="flex-1 max-w-7xl mx-auto w-full px-6 pt-28 pb-20 flex flex-col justify-center">
           
           {/* Hero Section */}
           <section className="min-h-[85vh] flex flex-col lg:flex-row items-center justify-between gap-12 lg:gap-24 mb-12 py-12">
@@ -214,7 +214,7 @@ export default function Landing({ user }: { user: any }) {
           </section>
 
           {/* Services Section */}
-          <section id="services" className="py-24 border-t border-black/10">
+          <section id="services" className="py-20 border-t border-black/10">
             <motion.h2 
               initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }}
               className="text-sm font-bold uppercase tracking-widest mb-16 text-gray-400"
@@ -249,7 +249,7 @@ export default function Landing({ user }: { user: any }) {
           </section>
 
           {/* Methodology Section */}
-          <section id="methodology" className="py-24 border-t border-black/10">
+          <section id="methodology" className="py-20 border-t border-black/10">
             <motion.h2 
               initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }}
               className="text-sm font-bold uppercase tracking-widest mb-16 text-gray-400"
@@ -288,7 +288,7 @@ export default function Landing({ user }: { user: any }) {
           </section>
 
           {/* Tech Stack Section */}
-          <section id="techstack" className="py-24 border-t border-black/10 overflow-hidden">
+          <section id="techstack" className="py-20 border-t border-black/10 overflow-hidden">
             <motion.h2 
               initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }}
               className="text-sm font-bold uppercase tracking-widest mb-16 text-gray-400 text-center"
@@ -313,7 +313,7 @@ export default function Landing({ user }: { user: any }) {
           </section>
 
           {/* Initiatives Section */}
-          <section id="initiatives" className="py-24 border-t border-black/10">
+          <section id="initiatives" className="py-20 border-t border-black/10">
             <motion.h2 
               initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }}
               className="text-sm font-bold uppercase tracking-widest mb-16 text-gray-400"
@@ -386,7 +386,7 @@ export default function Landing({ user }: { user: any }) {
           </section>
 
           {/* Why DevTech Section */}
-          <section id="whyus" className="py-24 border-t border-black/10">
+          <section id="whyus" className="py-20 border-t border-black/10">
             <div className="flex flex-col md:flex-row gap-12 md:gap-24">
               <motion.div 
                 initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }}
@@ -422,7 +422,7 @@ export default function Landing({ user }: { user: any }) {
           </section>
 
           {/* Manifesto / CTA Section */}
-          <section className="py-24 border-t border-black/10">
+          <section className="py-20 border-t border-black/10">
             <motion.div 
               initial={{ opacity: 0, scale: 0.95 }}
               whileInView={{ opacity: 1, scale: 1 }}
