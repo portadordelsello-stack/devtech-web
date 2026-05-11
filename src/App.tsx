@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import Landing from './pages/Landing';
 import Dashboard from './pages/Dashboard';
+import ProjectDetail from './pages/ProjectDetail';
 import { onAuthStateChanged, User } from 'firebase/auth';
 import { auth } from './firebase';
 
@@ -25,6 +26,7 @@ export default function App() {
     <Routes>
       <Route path="/" element={<Landing user={user} />} />
       <Route path="/dashboard" element={user ? <Dashboard user={user} /> : <Navigate to="/" />} />
+      <Route path="/project/:id" element={user ? <ProjectDetail user={user} /> : <Navigate to="/" />} />
     </Routes>
   );
 }

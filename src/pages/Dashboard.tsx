@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { auth, db } from '../firebase';
 import { doc, getDoc, setDoc, collection, query, where, getDocs, serverTimestamp, onSnapshot } from 'firebase/firestore';
+import { Link } from 'react-router-dom';
 import { handleFirestoreError, OperationType } from '../lib/firestoreUtils';
 import { LogOut, Plus, Settings, Briefcase, FileText } from 'lucide-react';
 import { ChatModal } from '../components/ChatModal';
@@ -180,8 +181,17 @@ export default function Dashboard({ user }: { user: any }) {
 
         {/* Main Panel */}
         <div className="md:col-span-2 space-y-6">
-           <div className="flex items-center justify-between">
-              <h2 className="text-2xl font-bold tracking-tight">Proyectos {isAdmin ? 'Globales' : 'Activos'}</h2>
+           <div className="mb-2">
+             <h2 className="text-3xl font-bold tracking-tight text-slate-900 mb-2">Consola de Proyectos</h2>
+             <p className="text-slate-500 font-medium">
+               {isAdmin 
+                 ? 'Panel de administración general de requerimientos y desarrollos globales.' 
+                 : 'Administra tus aplicaciones, supervisa el avance de tus desarrollos y consulta a nuestra IA sobre tus ideas.'}
+             </p>
+           </div>
+           
+           <div className="flex items-center justify-between mt-8">
+              <h3 className="text-xl font-bold tracking-tight">Proyectos {isAdmin ? 'Globales' : 'Activos'}</h3>
               {!isAdmin && (
                 <button onClick={() => setShowCreate(true)} className="flex items-center gap-2 bg-black text-white px-4 py-2 rounded-full text-sm font-bold hover:bg-slate-800 transition">
                   <Plus className="w-4 h-4" /> Nuevo Proyecto
@@ -212,15 +222,21 @@ export default function Dashboard({ user }: { user: any }) {
                  <div>
                    <h3 className="font-bold text-lg">{p.name}</h3>
                    <div className="flex items-center gap-3 mt-2 text-xs font-medium uppercase tracking-widest text-slate-400">
-                     <span className={`px-2 py-0.5 rounded-md ${p.status === 'draft' ? 'bg-amber-100 text-amber-700' : 'bg-green-100 text-green-700'}`}>
-                       {p.status}
+                     <span className={`px-2 py-0.5 rounded-md ${
+                       p.status === 'draft' ? 'bg-slate-100 text-slate-600' :
+                       p.status === 'pending_quote' ? 'bg-yellow-100 text-yellow-700 font-bold' :
+                       'bg-green-100 text-green-700'
+                     }`}>
+                       {p.status === 'draft' ? 'En Definición' : 
+                        p.status === 'pending_quote' ? 'Solicitud de Cotización' : 
+                        p.status}
                      </span>
                      {isAdmin && <span>ID: {p.ownerId.slice(0, 8)}...</span>}
                    </div>
                  </div>
-                 <button className="text-indigo-600 font-bold text-sm bg-indigo-50 px-4 py-2 rounded-full hover:bg-indigo-100 hidden md:block">
+                 <Link to={`/project/${p.id}`} className="text-indigo-600 font-bold text-sm bg-indigo-50 px-4 py-2 rounded-full hover:bg-indigo-100 hidden md:block">
                    Ver Detalles
-                 </button>
+                 </Link>
                </div>
              ))}
            </div>

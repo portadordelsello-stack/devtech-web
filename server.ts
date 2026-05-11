@@ -109,6 +109,66 @@ Respond briefly, professionally, and in Spanish. Conclude or propose solutions o
     }
   });
 
+  app.post("/api/project-setup", async (req, res) => {
+    try {
+      const { message, projectName } = req.body;
+      
+      if (!ai) {
+        return res.status(500).json({ reply: "Vertex AI no está configurado. Por favor, configure las credenciales en el Panel de Admin." });
+      }
+
+      const response = await ai.models.generateContent({
+        model: "gemini-2.5-flash",
+        contents: `Eres un Arquitecto de Software y Product Manager experto de DevTech. Estás ayudando a un cliente a definir los requerimientos y el alcance de su proyecto llamado "${projectName}".
+        
+Tu objetivo es hacer las preguntas correctas para entender qué quiere lograr, quiénes son los usuarios, qué funcionalidades clave necesita y cómo debería funcionar el MVP.
+Mantén tus respuestas breves, estructuradas y profesionales en español. Si ya tienes suficiente información, propón una lista de historias de usuario o requerimientos técnicos.\n\nUsuario: ${message}`,
+      });
+
+      res.json({ reply: response.text });
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: "Internal server error" });
+    }
+  });
+
+  app.post("/api/estimate-budget", async (req, res) => {
+    try {
+      const { tasks, projectName } = req.body;
+      
+      if (!ai) {
+        return res.status(500).json({ error: "Vertex AI no está configurado. Por favor, configure las credenciales en el Panel de Admin." });
+      }
+
+      if (!tasks || tasks.length === 0) {
+        return res.status(400).json({ error: "No hay tareas para estimar." });
+      }
+
+      const tasksList = tasks.map((t: any) => `- ${t.title}: ${t.description}`).join('\\n');
+
+      const response = await ai.models.generateContent({
+        model: "gemini-2.5-flash",
+        contents: `Eres un Arquitecto de Software y Tech Lead de DevTech. Estás estimando el presupuesto para el proyecto "${projectName}".
+        
+Aquí están las tareas del roadmap actual:
+${tasksList}
+
+Por favor, proporciona una estimación de presupuesto profesional que incluya:
+- Un desglose de las fases principales (ej. Diseño, Desarrollo, Pruebas, Despliegue)
+- Tiempos estimados en horas
+- Un costo aproximado en dólares USD (supón $50 USD por hora, puedes ajustar según complejidad).
+Organiza todo de manera legible en formato Markdown.
+Termina con un rango de costo total estimado en negrita.
+Sé realista y profesional.`,
+      });
+
+      res.json({ estimate: response.text });
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: "Internal server error" });
+    }
+  });
+
   // Vite middleware for development
   if (process.env.NODE_ENV !== "production") {
     const vite = await createViteServer({
