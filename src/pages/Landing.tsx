@@ -120,10 +120,10 @@ export default function Landing({ user }: { user: any }) {
           )}
         </AnimatePresence>
 
-        <main className="flex-1 max-w-7xl mx-auto w-full px-6 pt-24 pb-16 flex flex-col justify-center">
+        <main className="flex-1 max-w-7xl mx-auto w-full px-6 pt-16 md:pt-24 pb-10 md:pb-16 flex flex-col justify-center">
           
           {/* Hero Section */}
-          <section className="min-h-[85vh] flex flex-col lg:flex-row items-center justify-between gap-12 lg:gap-24 mb-8 py-10">
+          <section className="min-h-[85vh] flex flex-col lg:flex-row items-center justify-between gap-8 md:gap-12 lg:gap-24 mb-6 md:mb-8 py-6 md:py-10">
             <motion.div {...fadeIn} className="max-w-3xl lg:w-1/2 relative z-10 pt-10 lg:pt-0">
               <h1 className="text-[12vw] sm:text-[10vw] lg:text-[80px] xl:text-[90px] leading-[1] font-medium tracking-tight mb-8">
                 Aceleración Digital
@@ -214,10 +214,10 @@ export default function Landing({ user }: { user: any }) {
           </section>
 
           {/* Services Section */}
-          <section id="services" className="py-16 border-t border-black/10">
+          <section id="services" className="py-10 md:py-16 border-t border-black/10">
             <motion.h2 
               initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }}
-              className="text-sm font-bold uppercase tracking-widest mb-12 text-gray-400"
+              className="text-sm font-bold uppercase tracking-widest mb-8 md:mb-12 text-gray-400"
             >
               Soluciones Estratégicas
             </motion.h2>
@@ -249,10 +249,10 @@ export default function Landing({ user }: { user: any }) {
           </section>
 
           {/* Methodology Section */}
-          <section id="methodology" className="py-16 border-t border-black/10">
+          <section id="methodology" className="py-10 md:py-16 border-t border-black/10">
             <motion.h2 
               initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }}
-              className="text-sm font-bold uppercase tracking-widest mb-12 text-gray-400"
+              className="text-sm font-bold uppercase tracking-widest mb-8 md:mb-12 text-gray-400"
             >
               Cómo Trabajamos
             </motion.h2>
@@ -288,10 +288,10 @@ export default function Landing({ user }: { user: any }) {
           </section>
 
           {/* Tech Stack Section */}
-          <section id="techstack" className="py-16 border-t border-black/10 overflow-hidden">
+          <section id="techstack" className="py-10 md:py-16 border-t border-black/10 overflow-hidden">
             <motion.h2 
               initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }}
-              className="text-sm font-bold uppercase tracking-widest mb-12 text-gray-400 text-center"
+              className="text-sm font-bold uppercase tracking-widest mb-8 md:mb-12 text-gray-400 text-center"
             >
               Stack Tecnológico Premium
             </motion.h2>
@@ -313,10 +313,10 @@ export default function Landing({ user }: { user: any }) {
           </section>
 
           {/* Initiatives Section */}
-          <section id="initiatives" className="py-16 border-t border-black/10">
+          <section id="initiatives" className="py-10 md:py-16 border-t border-black/10">
             <motion.h2 
               initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }}
-              className="text-sm font-bold uppercase tracking-widest mb-12 text-gray-400"
+              className="text-sm font-bold uppercase tracking-widest mb-8 md:mb-12 text-gray-400"
             >
               Nuestras Iniciativas
             </motion.h2>
@@ -386,8 +386,8 @@ export default function Landing({ user }: { user: any }) {
           </section>
 
           {/* Why DevTech Section */}
-          <section id="whyus" className="py-16 border-t border-black/10">
-            <div className="flex flex-col md:flex-row gap-12 md:gap-24">
+          <section id="whyus" className="py-10 md:py-16 border-t border-black/10">
+            <div className="flex flex-col md:flex-row gap-8 md:gap-12 lg:gap-24">
               <motion.div 
                 initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }}
                 className="md:w-1/3"
@@ -422,7 +422,7 @@ export default function Landing({ user }: { user: any }) {
           </section>
 
           {/* Manifesto / CTA Section */}
-          <section className="py-16 border-t border-black/10">
+          <section className="py-10 md:py-16 border-t border-black/10">
             <motion.div 
               initial={{ opacity: 0, scale: 0.95 }}
               whileInView={{ opacity: 1, scale: 1 }}
