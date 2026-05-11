@@ -3,8 +3,8 @@ import { useParams, Link, useNavigate } from 'react-router-dom';
 import { auth, db } from '../firebase';
 import { doc, getDoc, updateDoc, serverTimestamp } from 'firebase/firestore';
 import { handleFirestoreError, OperationType } from '../lib/firestoreUtils';
-import { motion } from 'motion/react';
-import { ArrowLeft, BrainCircuit, CheckSquare, DollarSign, Send, User, Loader2, Save } from 'lucide-react';
+import { Bot, ArrowLeft, BrainCircuit, CheckSquare, DollarSign, Send, User, Loader2, Save } from 'lucide-react';
+import { ChatWidget } from '../components/ChatModal';
 
 type TaskStatus = 'backlog' | 'todo' | 'inprogress' | 'done';
 
@@ -15,24 +15,13 @@ interface Task {
   status: TaskStatus;
 }
 
-interface Message {
-  id: string;
-  role: 'user' | 'ai';
-  text: string;
-}
-
 export default function ProjectDetail({ user }: { user: any }) {
   const { id } = useParams();
   const navigate = useNavigate();
   const isAdmin = user?.email === 'portadordelsello@gmail.com';
   const [project, setProject] = useState<any>(null);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<'ai' | 'kanban' | 'budget' | 'admin'>('ai');
-
-  const [messages, setMessages] = useState<Message[]>([]);
-  const [inputMessage, setInputMessage] = useState('');
-  const [isLoadingChat, setIsLoadingChat] = useState(false);
-  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const [activeTab, setActiveTab] = useState<'kanban' | 'budget' | 'admin'>('kanban');
 
   const [tasks, setTasks] = useState<Task[]>([]);
   const [newTaskTitle, setNewTaskTitle] = useState('');
@@ -60,16 +49,6 @@ export default function ProjectDetail({ user }: { user: any }) {
           if (data.budgetEstimate) {
             setBudgetEstimate(data.budgetEstimate);
           }
-
-          if (!data.requirementsChat) {
-             setMessages([{
-                 id: 'init',
-                 role: 'ai',
-                 text: `¡Hola! Soy el Asistente de IA de DevTech. Estoy aquí para ayudarte a definir el alcance y los requerimientos de "${data.name}". ¿Qué tipo de funcionalidades principales tienes en mente para comenzar?`
-             }]);
-          } else {
-             setMessages(data.requirementsChat);
-          }
         } else {
           navigate('/dashboard');
         }
@@ -81,10 +60,6 @@ export default function ProjectDetail({ user }: { user: any }) {
     };
     fetchProject();
   }, [id, user, navigate]);
-
-  useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages]);
 
   const handleEstimateBudget = async () => {
     if (!id || tasks.length === 0) {
@@ -115,53 +90,6 @@ export default function ProjectDetail({ user }: { user: any }) {
       alert("Ocurrió un error al estimar el presupuesto.");
     } finally {
       setIsLoadingBudget(false);
-    }
-  };
-
-  const saveChatHistory = async (newMessages: Message[]) => {
-      if (!id) return;
-      try {
-          await updateDoc(doc(db, 'projects', id), {
-             requirementsChat: newMessages,
-             updatedAt: serverTimestamp()
-          });
-      } catch (error) {
-          console.error("Error saving chat history", error);
-      }
-  };
-
-  const handleSendMessage = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!inputMessage.trim() || isLoadingChat) return;
-
-    const userMsg: Message = { id: Date.now().toString(), role: 'user', text: inputMessage.trim() };
-    const newContext = [...messages, userMsg];
-    setMessages(newContext);
-    setInputMessage('');
-    setIsLoadingChat(true);
-
-    try {
-      // Create a context string for the prompt
-      const contextString = newContext.map(m => `${m.role === 'ai' ? 'Asistente' : 'Usuario'}: ${m.text}`).join('\n\n');
-
-      const response = await fetch('/api/project-setup', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message: contextString, projectName: project?.name }),
-      });
-
-      if (!response.ok) throw new Error('Error al generar respuesta');
-      const data = await response.json();
-
-      const aiMsg: Message = { id: (Date.now() + 1).toString(), role: 'ai', text: data.reply };
-      const finalizedMessages = [...newContext, aiMsg];
-      setMessages(finalizedMessages);
-      saveChatHistory(finalizedMessages);
-
-    } catch (error) {
-      console.error(error);
-    } finally {
-      setIsLoadingChat(false);
     }
   };
 
@@ -241,20 +169,9 @@ export default function ProjectDetail({ user }: { user: any }) {
 
       <main className="flex-1 max-w-7xl mx-auto w-full p-4 md:p-6 flex flex-col md:flex-row gap-6">
         {/* Sidebar Tabs */}
-        <div className="w-full md:w-64 flex flex-col gap-2 shrink-0">
-          <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-4 sticky top-6">
+        <div className="w-full md:w-80 flex flex-col gap-4 shrink-0 h-[75vh] min-h-[500px]">
+          <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-4">
             <h3 className="font-bold mb-4 uppercase text-[10px] tracking-widest text-slate-500">Módulos Activos</h3>
-            
-            <button 
-              onClick={() => setActiveTab('ai')}
-              className={`w-full flex items-center gap-3 p-3 rounded-xl transition font-medium text-sm border ${
-                activeTab === 'ai' 
-                  ? 'bg-indigo-50 border-indigo-100 text-indigo-700' 
-                  : 'bg-transparent border-transparent text-slate-600 hover:bg-slate-50'
-              }`}
-            >
-              <BrainCircuit className="w-4 h-4" /> Asistente de IA
-            </button>
             
             <button 
               onClick={() => setActiveTab('kanban')}
@@ -291,79 +208,14 @@ export default function ProjectDetail({ user }: { user: any }) {
               </button>
             )}
           </div>
+          
+          <div className="bg-white rounded-2xl shadow-sm border border-slate-200 flex-1 min-h-[400px] overflow-hidden flex flex-col">
+             <ChatWidget title="Asistente de Proyectos" subtitle="Impulsado por Vertex AI" />
+          </div>
         </div>
 
         {/* Content Area */}
         <div className="flex-1 bg-white rounded-2xl shadow-sm border border-slate-200 flex flex-col h-[75vh] min-h-[500px]">
-          {activeTab === 'ai' && (
-            <>
-              {/* Chat Area */}
-              <div className="flex-1 overflow-y-auto p-6 bg-slate-50/50">
-                <div className="flex flex-col gap-6 max-w-3xl mx-auto">
-                  {messages.map((msg) => (
-                    <motion.div
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      key={msg.id}
-                      className={`flex gap-4 ${msg.role === 'user' ? 'flex-row-reverse' : ''}`}
-                    >
-                      <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 mt-1 ${
-                        msg.role === 'user' ? 'bg-indigo-600' : 'bg-black'
-                      }`}>
-                        {msg.role === 'user' ? <User className="w-4 h-4 text-white" /> : <BrainCircuit className="w-4 h-4 text-white" />}
-                      </div>
-                      <div className={`max-w-[85%] rounded-2xl px-5 py-3.5 text-sm leading-relaxed ${
-                        msg.role === 'user'
-                          ? 'bg-indigo-600 text-white rounded-tr-none shadow-sm'
-                          : 'bg-white text-slate-800 rounded-tl-none shadow-sm border border-slate-200 markdown-body'
-                      }`}>
-                        {msg.text.split('\\n').map((line, i) => (
-                          <span key={i}>
-                            {line}
-                            <br />
-                          </span>
-                        ))}
-                      </div>
-                    </motion.div>
-                  ))}
-                  {isLoadingChat && (
-                    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex gap-4 max-w-3xl mx-auto w-full">
-                      <div className="w-8 h-8 rounded-full bg-black flex items-center justify-center flex-shrink-0 mt-1">
-                        <BrainCircuit className="w-4 h-4 text-white" />
-                      </div>
-                      <div className="bg-white rounded-2xl rounded-tl-none px-5 py-4 shadow-sm border border-slate-200 flex items-center gap-2">
-                        <Loader2 className="w-4 h-4 text-slate-400 animate-spin" />
-                        <span className="text-sm text-slate-500 font-medium">Analizando y redactando...</span>
-                      </div>
-                    </motion.div>
-                  )}
-                  <div ref={messagesEndRef} />
-                </div>
-              </div>
-
-              {/* Input Area */}
-              <div className="p-4 sm:p-6 bg-white border-t border-slate-200 rounded-b-2xl">
-                <form onSubmit={handleSendMessage} className="max-w-3xl mx-auto relative flex items-center">
-                  <input
-                    type="text"
-                    value={inputMessage}
-                    onChange={(e) => setInputMessage(e.target.value)}
-                    placeholder="Escribe tus requerimientos aquí..."
-                    className="w-full bg-slate-50 border border-slate-200 text-slate-900 text-sm rounded-full pl-6 pr-14 py-4 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-400 transition-all font-medium placeholder:text-slate-400"
-                    disabled={isLoadingChat}
-                  />
-                  <button
-                    type="submit"
-                    disabled={!inputMessage.trim() || isLoadingChat}
-                    className="absolute right-2 p-2.5 bg-indigo-600 text-white rounded-full hover:bg-indigo-700 disabled:opacity-50 disabled:hover:bg-indigo-600 transition-colors"
-                  >
-                    <Send className="w-4 h-4" />
-                  </button>
-                </form>
-              </div>
-            </>
-          )}
-
           {activeTab === 'kanban' && (
             <div className="flex-1 flex flex-col p-6 bg-slate-50/50 rounded-2xl overflow-hidden">
               <div className="flex items-center justify-between mb-6">

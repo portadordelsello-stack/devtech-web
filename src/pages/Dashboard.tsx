@@ -3,8 +3,7 @@ import { auth, db } from '../firebase';
 import { doc, getDoc, setDoc, collection, query, where, getDocs, serverTimestamp, onSnapshot } from 'firebase/firestore';
 import { Link } from 'react-router-dom';
 import { handleFirestoreError, OperationType } from '../lib/firestoreUtils';
-import { LogOut, Plus, Settings, Briefcase, FileText, Bot } from 'lucide-react';
-import { ChatModal } from '../components/ChatModal';
+import { LogOut, Plus, Settings, Briefcase, FileText } from 'lucide-react';
 
 export default function Dashboard({ user }: { user: any }) {
   const isAdmin = user?.email === 'portadordelsello@gmail.com';
@@ -19,7 +18,6 @@ export default function Dashboard({ user }: { user: any }) {
   const [phone, setPhone] = useState('');
   const [name, setName] = useState(user?.displayName || '');
   const [showAdminConfig, setShowAdminConfig] = useState(false);
-  const [isChatOpen, setIsChatOpen] = useState(false);
 
   useEffect(() => {
     if (!user) return;
@@ -142,20 +140,13 @@ export default function Dashboard({ user }: { user: any }) {
         </div>
       </header>
 
-      <main className="flex-1 max-w-6xl w-full mx-auto p-6 grid grid-cols-1 md:grid-cols-3 gap-6">
+      <main className={`flex-1 max-w-6xl w-full mx-auto p-6 grid grid-cols-1 ${isAdmin ? 'md:grid-cols-3 gap-6' : 'gap-6'}`}>
         
         {/* Sidebar / Tools */}
-        <div className="md:col-span-1 space-y-4">
-          <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
-            <h3 className="font-bold mb-4 uppercase text-xs tracking-widest text-slate-500">Herramientas</h3>
-            {!isAdmin ? (
-              <button onClick={() => setIsChatOpen(true)} className="w-full flex items-center gap-3 p-3 text-left rounded-xl hover:bg-indigo-50 text-indigo-700 transition font-medium border border-transparent hover:border-indigo-100">
-                <div className="w-10 h-10 bg-indigo-100 rounded-full flex items-center justify-center">
-                  <Bot className="w-5 h-5 text-indigo-600" />
-                </div>
-                Asistente de Proyectos
-              </button>
-            ) : (
+        {isAdmin && (
+          <div className="md:col-span-1 space-y-4">
+            <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+              <h3 className="font-bold mb-4 uppercase text-xs tracking-widest text-slate-500">Herramientas</h3>
               <button 
                 onClick={() => setShowAdminConfig(!showAdminConfig)} 
                 className="w-full flex items-center gap-3 p-3 text-left rounded-xl hover:bg-slate-50 text-slate-700 transition font-medium"
@@ -165,18 +156,18 @@ export default function Dashboard({ user }: { user: any }) {
                 </div>
                 Configuración Vertex IA
               </button>
+            </div>
+
+            {showAdminConfig && (
+              <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+                 <AdminConfigForm />
+              </div>
             )}
           </div>
-
-          {isAdmin && showAdminConfig && (
-            <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
-               <AdminConfigForm />
-            </div>
-          )}
-        </div>
+        )}
 
         {/* Main Panel */}
-        <div className="md:col-span-2 space-y-6">
+        <div className={`${isAdmin ? 'md:col-span-2' : ''} space-y-6`}>
            <div className="mb-2">
              <h2 className="text-3xl font-bold tracking-tight text-slate-900 mb-2">Consola de Proyectos</h2>
              <p className="text-slate-500 font-medium">
@@ -239,8 +230,6 @@ export default function Dashboard({ user }: { user: any }) {
         </div>
 
       </main>
-
-      <ChatModal isOpen={isChatOpen} onClose={() => setIsChatOpen(false)} />
     </div>
   );
 }

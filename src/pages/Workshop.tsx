@@ -269,7 +269,7 @@ export default function Workshop({ user }: { user: any }) {
               <p className="text-slate-500">Personas que quieren crecer digitalmente sin grandes costos iniciales.</p>
             </div>
 
-            <div class="bg-[#F8F9FA] border border-slate-200 rounded-2xl p-6">
+            <div className="bg-[#F8F9FA] border border-slate-200 rounded-2xl p-6">
               <h4 className="font-bold text-black mb-3">Comercios</h4>
               <p className="text-slate-500">Negocios que buscan organizar procesos y mejorar atención al cliente.</p>
             </div>
