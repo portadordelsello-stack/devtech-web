@@ -3,8 +3,9 @@ import { useParams, Link, useNavigate } from 'react-router-dom';
 import { auth, db } from '../firebase';
 import { doc, getDoc, updateDoc, serverTimestamp } from 'firebase/firestore';
 import { handleFirestoreError, OperationType } from '../lib/firestoreUtils';
-import { Bot, ArrowLeft, BrainCircuit, CheckSquare, DollarSign, Send, User, Loader2, Save } from 'lucide-react';
+import { Bot, ArrowLeft, BrainCircuit, CheckSquare, DollarSign, Send, User, Loader2, Save, Network, Check, Info, X, ZoomIn, ZoomOut, Maximize } from 'lucide-react';
 import { ChatWidget } from '../components/ChatModal';
+import { TransformWrapper, TransformComponent, useControls } from 'react-zoom-pan-pinch';
 
 type TaskStatus = 'backlog' | 'todo' | 'inprogress' | 'done';
 
@@ -21,7 +22,8 @@ export default function ProjectDetail({ user }: { user: any }) {
   const isAdmin = user?.email === 'portadordelsello@gmail.com';
   const [project, setProject] = useState<any>(null);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<'kanban' | 'budget' | 'admin'>('kanban');
+  const [activeTab, setActiveTab] = useState<'mindmap' | 'budget' | 'admin'>('mindmap');
+  const [showGuide, setShowGuide] = useState(false);
 
   const [tasks, setTasks] = useState<Task[]>([]);
   const [newTaskTitle, setNewTaskTitle] = useState('');
@@ -118,36 +120,25 @@ export default function ProjectDetail({ user }: { user: any }) {
     }
   };
 
-  const handleDragStart = (e: React.DragEvent, taskId: string) => {
-    e.dataTransfer.setData('taskId', taskId);
-  };
-
-  const handleDragOver = (e: React.DragEvent) => {
-    e.preventDefault();
-  };
-
-  const handleDrop = async (e: React.DragEvent, status: TaskStatus) => {
-    e.preventDefault();
-    const taskId = e.dataTransfer.getData('taskId');
-    if (taskId && id) {
-      const newTasks = tasks.map(t => t.id === taskId ? { ...t, status } : t);
-      setTasks(newTasks);
-      try {
-        await updateDoc(doc(db, 'projects', id), { 
-          tasks: newTasks,
-          updatedAt: serverTimestamp()
-        });
-      } catch (error) {
-         console.error("Error updating task status", error);
-      }
+  const handleStatusChange = async (taskId: string, newStatus: TaskStatus) => {
+    if (!id) return;
+    const newTasks = tasks.map(t => t.id === taskId ? { ...t, status: newStatus } : t);
+    setTasks(newTasks);
+    try {
+      await updateDoc(doc(db, 'projects', id), { 
+        tasks: newTasks,
+        updatedAt: serverTimestamp()
+      });
+    } catch (error) {
+       console.error("Error updating task status", error);
     }
   };
 
   const columns: { id: TaskStatus, title: string }[] = [
-    { id: 'backlog', title: 'Backlog' },
-    { id: 'todo', title: 'To Do' },
-    { id: 'inprogress', title: 'In Progress' },
-    { id: 'done', title: 'Done' }
+    { id: 'backlog', title: 'Reserva (Backlog)' },
+    { id: 'todo', title: 'Por hacer (To Do)' },
+    { id: 'inprogress', title: 'En curso (In Progress)' },
+    { id: 'done', title: 'Hecho (Done)' }
   ];
 
   if (loading) {
@@ -174,14 +165,14 @@ export default function ProjectDetail({ user }: { user: any }) {
             <h3 className="font-bold mb-4 uppercase text-[10px] tracking-widest text-slate-500">Módulos Activos</h3>
             
             <button 
-              onClick={() => setActiveTab('kanban')}
+              onClick={() => setActiveTab('mindmap')}
               className={`w-full flex items-center gap-3 p-3 rounded-xl transition font-medium text-sm border mt-1 ${
-                activeTab === 'kanban' 
+                activeTab === 'mindmap' 
                   ? 'bg-indigo-50 border-indigo-100 text-indigo-700' 
                   : 'bg-transparent border-transparent text-slate-600 hover:bg-slate-50'
               }`}
             >
-              <CheckSquare className="w-4 h-4" /> Roadmap
+              <Network className="w-4 h-4" /> Mind Map
             </button>
 
             <button 
@@ -216,57 +207,128 @@ export default function ProjectDetail({ user }: { user: any }) {
 
         {/* Content Area */}
         <div className="flex-1 bg-white rounded-2xl shadow-sm border border-slate-200 flex flex-col h-[75vh] min-h-[500px]">
-          {activeTab === 'kanban' && (
+          {activeTab === 'mindmap' && (
             <div className="flex-1 flex flex-col p-6 bg-slate-50/50 rounded-2xl overflow-hidden">
               <div className="flex items-center justify-between mb-6">
                 <div>
-                  <h3 className="text-xl font-bold">Roadmap del Proyecto</h3>
-                  <p className="text-slate-500 text-sm">Organiza las historias de usuario y tareas de desarrollo.</p>
+                  <div className="flex items-center gap-2">
+                    <h3 className="text-xl font-bold">Mind Map del Proyecto</h3>
+                    <button onClick={() => setShowGuide(true)} className="p-1.5 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-full transition" title="Guía del Mind Map">
+                      <Info className="w-5 h-5" />
+                    </button>
+                  </div>
+                  <p className="text-slate-500 text-sm">Visualiza la estructura y estado de las tareas de manera conectada.</p>
                 </div>
               </div>
               
-              <div className="flex gap-4 overflow-x-auto pb-4 h-full">
-                {columns.map(col => (
-                  <div 
-                    key={col.id} 
-                    className="flex-1 min-w-[280px] bg-slate-100/50 rounded-2xl p-4 flex flex-col border border-slate-200/50"
-                    onDragOver={handleDragOver}
-                    onDrop={(e) => handleDrop(e, col.id)}
-                  >
-                    <div className="flex items-center justify-between mb-4 px-2">
-                       <h4 className="font-bold text-sm text-slate-700 uppercase tracking-wider">{col.title}</h4>
-                       <span className="text-xs font-bold text-slate-400 bg-slate-200 px-2 py-0.5 rounded-full">
-                         {tasks.filter(t => t.status === col.id).length}
-                       </span>
+              <div className="flex-1 overflow-hidden bg-[#fafafa] rounded-xl border border-slate-200 relative bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px] shadow-inner">
+                 <TransformWrapper
+                    initialScale={0.9}
+                    minScale={0.2}
+                    maxScale={4}
+                    centerOnInit={false}
+                    wheel={{ step: 0.1 }}
+                 >
+                   {({ zoomIn, zoomOut, resetTransform }) => (
+                     <>
+                       <div className="absolute top-4 right-4 z-20 flex gap-2">
+                         <button onClick={() => zoomIn()} className="p-2 bg-white rounded-lg shadow-sm border border-slate-200 text-slate-600 hover:text-indigo-600 hover:bg-indigo-50 transition" title="Acercar">
+                           <ZoomIn className="w-5 h-5" />
+                         </button>
+                         <button onClick={() => zoomOut()} className="p-2 bg-white rounded-lg shadow-sm border border-slate-200 text-slate-600 hover:text-indigo-600 hover:bg-indigo-50 transition" title="Alejar">
+                           <ZoomOut className="w-5 h-5" />
+                         </button>
+                         <button onClick={() => resetTransform()} className="p-2 bg-white rounded-lg shadow-sm border border-slate-200 text-slate-600 hover:text-indigo-600 hover:bg-indigo-50 transition" title="Restaurar zoom">
+                           <Maximize className="w-5 h-5" />
+                         </button>
+                       </div>
+                       <TransformComponent wrapperClass="w-full h-full cursor-grab active:cursor-grabbing" contentClass="p-16 min-w-max flex items-center justify-start">
+                         <div className="flex items-center gap-12">
+                            {/* Root Node */}
+                    <div className="bg-indigo-600 text-white font-bold px-6 py-4 rounded-2xl shadow-sm border border-indigo-700 w-48 text-center shrink-0 z-10 relative">
+                      {project?.name || 'Proyecto'}
+                      {/* Right connector */}
+                      <div className="absolute top-1/2 -right-12 w-12 border-t-2 border-slate-300"></div>
                     </div>
 
-                    <div className="flex-1 overflow-y-auto space-y-3">
-                      {tasks.filter(t => t.status === col.id).map(task => (
-                        <div 
-                          key={task.id}
-                          draggable
-                          onDragStart={(e) => handleDragStart(e, task.id)}
-                          className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm cursor-grab active:cursor-grabbing hover:border-indigo-300 hover:shadow transition-all"
-                        >
-                          <h5 className="font-medium text-sm text-slate-800">{task.title}</h5>
-                          {task.description && <p className="text-xs text-slate-500 mt-2 line-clamp-2">{task.description}</p>}
-                        </div>
-                      ))}
-                      
-                      {col.id === 'backlog' && (
-                        <form onSubmit={handleCreateTask} className="mt-2">
-                          <input 
-                            type="text" 
-                            value={newTaskTitle}
-                            onChange={(e) => setNewTaskTitle(e.target.value)}
-                            placeholder="+ Nueva tarea..." 
-                            className="text-sm bg-white border border-slate-200 rounded-xl px-4 py-3 w-full focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-400 transition"
-                          />
-                        </form>
-                      )}
+                    {/* Level 1: Statuses */}
+                    <div className="flex flex-col gap-12 relative">
+                      {/* Vertical spine for level 1 */}
+                      <div className="absolute left-[-3rem] top-[24px] bottom-[24px] border-l-2 border-slate-300"></div>
+
+                      {columns.map(col => {
+                         const colTasks = tasks.filter(t => t.status === col.id);
+                         return (
+                           <div key={col.id} className="flex items-center gap-12 relative z-10">
+                             {/* Left connector to vertical spine */}
+                             <div className="absolute top-1/2 -left-12 w-12 border-t-2 border-slate-300"></div>
+
+                             {/* Status Node */}
+                             <div className="bg-slate-800 text-white font-medium px-6 py-3 rounded-xl shadow-sm w-40 text-center shrink-0 relative">
+                               {col.title}
+                               {/* Right connector if tasks exist */}
+                               {colTasks.length > 0 && (
+                                 <div className="absolute top-1/2 -right-12 w-12 border-t-2 border-slate-300"></div>
+                               )}
+                             </div>
+
+                             {/* Level 2: Tasks */}
+                             {colTasks.length > 0 && (
+                               <div className="flex flex-col gap-4 relative pl-0">
+                                 {/* Vertical spine for level 2 if multiple tasks */}
+                                 {colTasks.length > 1 && (
+                                   <div className="absolute left-[-3rem] top-[36px] bottom-[36px] border-l-2 border-slate-300 hidden md:block"></div>
+                                 )}
+                                 
+                                 {colTasks.map((task) => (
+                                   <div key={task.id} className="flex items-center relative z-10">
+                                     {/* Left connector to vertical spine Level 2 */}
+                                     {colTasks.length > 1 && (
+                                       <div className="absolute top-1/2 -left-12 w-12 border-t-2 border-slate-300 hidden md:block"></div>
+                                     )}
+
+                                     <div className="bg-white text-slate-800 border border-slate-200 p-4 rounded-xl shadow-sm w-72 hover:border-indigo-300 hover:shadow-md transition shrink-0 relative group">
+                                       <div className="flex justify-between items-start mb-1">
+                                          <h5 className="font-bold text-sm line-clamp-2 pr-6">{task.title}</h5>
+                                       </div>
+                                       {task.description && <p className="text-xs text-slate-500 line-clamp-2 mt-2">{task.description}</p>}
+                                       <div className="mt-3">
+                                          <select 
+                                            value={task.status}
+                                            onChange={(e) => handleStatusChange(task.id, e.target.value as TaskStatus)}
+                                            className="text-xs bg-slate-50 border border-slate-200 rounded-lg px-2 py-1 focus:outline-none focus:ring-1 focus:ring-indigo-500 w-full"
+                                          >
+                                            {columns.map(c => <option key={c.id} value={c.id}>{c.title}</option>)}
+                                          </select>
+                                       </div>
+                                     </div>
+                                   </div>
+                                 ))}
+                               </div>
+                             )}
+                           </div>
+                         );
+                      })}
                     </div>
-                  </div>
-                ))}
+                         </div>
+                       </TransformComponent>
+                     </>
+                   )}
+                 </TransformWrapper>
+              </div>
+
+              {/* Form for new tasks */}
+              <div className="mt-4 flex gap-2 w-full pt-4 border-t border-slate-200/50 shrink-0">
+                 <form onSubmit={handleCreateTask} className="w-full flex gap-2">
+                   <input 
+                     type="text" 
+                     value={newTaskTitle}
+                     onChange={(e) => setNewTaskTitle(e.target.value)}
+                     placeholder="+ Añadir nueva tarea al Backlog..." 
+                     className="text-sm bg-white border border-slate-200 rounded-xl px-4 py-3 w-full focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-400 transition"
+                   />
+                   <button type="submit" disabled={!newTaskTitle.trim()} className="bg-indigo-600 text-white px-6 py-3 rounded-xl hover:bg-indigo-700 disabled:opacity-50 transition font-medium whitespace-nowrap">Añadir</button>
+                 </form>
               </div>
             </div>
           )}
@@ -409,6 +471,69 @@ export default function ProjectDetail({ user }: { user: any }) {
           )}
         </div>
       </main>
+
+      {showGuide && (
+        <div className="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl w-full max-w-2xl shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+             <div className="p-4 sm:p-6 border-b border-slate-100 flex items-center justify-between bg-slate-50">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 bg-indigo-100 text-indigo-600 flex items-center justify-center rounded-full">
+                    <Info className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <h3 className="font-bold text-slate-800">Guía del Mind Map</h3>
+                    <p className="text-sm text-slate-500">¿Qué significan estas categorías?</p>
+                  </div>
+                </div>
+                <button onClick={() => setShowGuide(false)} className="p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-200 rounded-full transition">
+                  <X className="w-5 h-5" />
+                </button>
+             </div>
+             <div className="p-6 overflow-y-auto max-h-[60vh]">
+               <div className="space-y-6 text-sm text-slate-700">
+                 <p>Estas cuatro categorías forman la estructura básica de un tablero Kanban o de gestión de proyectos ágiles. Representan el flujo de trabajo desde que surge una idea hasta que se completa.</p>
+                 
+                 <div className="bg-slate-50 p-4 rounded-xl border border-slate-100">
+                    <h4 className="font-bold text-slate-900 mb-1 flex items-center gap-2">
+                       <div className="w-2 h-2 rounded-full bg-slate-400"></div>
+                       Reserva (Backlog)
+                    </h4>
+                    <p className="text-slate-600">Es el repositorio central de todas las tareas, ideas, requisitos y correcciones que podrían realizarse en el futuro. No son tareas activas, sino una lista priorizada de lo que está "en espera".</p>
+                 </div>
+
+                 <div className="bg-indigo-50/50 p-4 rounded-xl border border-indigo-50">
+                    <h4 className="font-bold text-indigo-900 mb-1 flex items-center gap-2">
+                       <div className="w-2 h-2 rounded-full bg-indigo-400"></div>
+                       Por hacer (To Do)
+                    </h4>
+                    <p className="text-slate-600">Contiene las tareas seleccionadas del backlog que el equipo se ha comprometido a realizar en el ciclo actual (como un sprint). Representa el trabajo listo para ser iniciado.</p>
+                 </div>
+
+                 <div className="bg-amber-50 p-4 rounded-xl border border-amber-100">
+                    <h4 className="font-bold text-amber-900 mb-1 flex items-center gap-2">
+                       <div className="w-2 h-2 rounded-full bg-amber-400"></div>
+                       En curso (In Progress)
+                    </h4>
+                    <p className="text-slate-600">Tareas que se están ejecutando activamente en este momento. Ayuda a visualizar la carga de trabajo real y a identificar posibles cuellos de botella.</p>
+                 </div>
+
+                 <div className="bg-emerald-50 p-4 rounded-xl border border-emerald-100">
+                    <h4 className="font-bold text-emerald-900 mb-1 flex items-center gap-2">
+                       <div className="w-2 h-2 rounded-full bg-emerald-400"></div>
+                       Hecho (Done)
+                    </h4>
+                    <p className="text-slate-600">Tareas que han cumplido con todos los criterios de calidad y están terminadas. Una vez aquí, el trabajo se considera entregable o cerrado.</p>
+                 </div>
+               </div>
+             </div>
+             <div className="p-4 sm:p-6 border-t border-slate-100 bg-slate-50 flex justify-end">
+                <button onClick={() => setShowGuide(false)} className="px-6 py-2 bg-slate-900 hover:bg-slate-800 text-white rounded-xl font-medium transition-colors">
+                  Entendido
+                </button>
+             </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
