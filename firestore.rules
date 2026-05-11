@@ -1,0 +1,79 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // 0. Global Safety Net
+    match /{document=**} { 
+      allow read, write: if false; 
+    }
+
+    // Primitive Helpers
+    function isValidId(id) { 
+      return id is string && id.size() > 0 && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$'); 
+    }
+    function incoming() { return request.resource.data; }
+    function existing() { return resource.data; }
+    function isSignedIn() { return request.auth != null; }
+    function isVerified() { return request.auth.token.email_verified == true; }
+    function isAdmin() { return isSignedIn() && request.auth.token.email == 'portadordelsello@gmail.com'; }
+
+    // Validation Blueprint for User
+    function isValidUser(data) {
+      return data.keys().hasAll(['email', 'createdAt', 'updatedAt'])
+        && data.email is string && data.email.size() <= 256
+        && (!('name' in data) || (data.name is string && data.name.size() <= 100))
+        && (!('phone' in data) || (data.phone is string && data.phone.size() <= 20));
+    }
+
+    // Validation Blueprint for Project
+    function isValidProject(data) {
+      return data.keys().hasAll(['name', 'ownerId', 'status', 'createdAt', 'updatedAt'])
+        && data.name is string && data.name.size() > 0 && data.name.size() <= 150
+        && data.ownerId is string && data.ownerId == request.auth.uid
+        && data.status is string && data.status in ['draft', 'active', 'completed'];
+    }
+
+    match /users/{userId} {
+      allow read: if isSignedIn() && (userId == request.auth.uid || isAdmin());
+      allow create: if isSignedIn() 
+        && isValidId(userId) 
+        && userId == request.auth.uid
+        && isValidUser(incoming())
+        && incoming().createdAt == request.time
+        && incoming().updatedAt == request.time
+        // Strict key check on create
+        && incoming().keys().hasOnly(['email', 'name', 'phone', 'createdAt', 'updatedAt']);
+      allow update: if isSignedIn() 
+        && userId == request.auth.uid
+        && isValidUser(incoming())
+        && incoming().updatedAt == request.time
+        && incoming().createdAt == existing().createdAt
+        && incoming().email == existing().email // immutable
+        && incoming().diff(existing()).affectedKeys().hasOnly(['name', 'phone', 'updatedAt']);
+    }
+
+    match /projects/{projectId} {
+      allow read: if isSignedIn() && (existing().ownerId == request.auth.uid || isAdmin());
+      // list query must check ownerId on resource.data
+      allow list: if isSignedIn() && (resource.data.ownerId == request.auth.uid || isAdmin());
+      allow create: if isSignedIn() 
+        && isValidId(projectId)
+        && isValidProject(incoming())
+        && incoming().createdAt == request.time
+        && incoming().updatedAt == request.time
+        // Strict key check
+        && incoming().keys().hasOnly(['name', 'ownerId', 'status', 'createdAt', 'updatedAt']);
+      allow update: if isSignedIn() 
+        && existing().ownerId == request.auth.uid
+        && isValidProject(incoming())
+        && incoming().updatedAt == request.time
+        && incoming().createdAt == existing().createdAt
+        && incoming().ownerId == existing().ownerId // immutable
+        && (
+            isAdmin() || 
+            (incoming().diff(existing()).affectedKeys().hasOnly(['name', 'status', 'updatedAt']))
+           );
+      allow delete: if isAdmin() || (isSignedIn() && existing().ownerId == request.auth.uid);
+    }
+  }
+}
