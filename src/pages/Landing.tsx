@@ -12,7 +12,6 @@ import {
   HeartPulse,
   Sparkles
 } from 'lucide-react';
-import { ChatModal } from '../components/ChatModal';
 import { signInWithPopup, GoogleAuthProvider } from 'firebase/auth';
 import { auth } from '../firebase';
 
@@ -25,7 +24,6 @@ const fadeIn = {
 export default function Landing({ user }: { user: any }) {
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(true);
-  const [isChatModalOpen, setIsChatModalOpen] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   useEffect(() => {
@@ -516,8 +514,6 @@ export default function Landing({ user }: { user: any }) {
           </div>
         </footer>
       </div>
-
-      <ChatModal isOpen={isChatModalOpen} onClose={() => setIsChatModalOpen(false)} />
     </>
   );
 }

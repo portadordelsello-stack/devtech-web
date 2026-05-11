@@ -2,7 +2,7 @@ import express from "express";
 import { createServer as createViteServer } from "vite";
 import path from "path";
 import fs from "fs";
-import { GoogleGenAI } from "@google/genai";
+import { GoogleGenAI } from '@google/genai';
 
 let ai: GoogleGenAI | null = null;
 const configPath = path.join(process.cwd(), 'system-config.json');
@@ -27,24 +27,25 @@ function getSystemConfig() {
 
 function initializeAI() {
   const cfg = getSystemConfig();
+  
   if (cfg.apiKey && cfg.projectId && cfg.location) {
     try {
       ai = new GoogleGenAI({ 
-          // @ts-ignore
+          // @ts-ignore - Indispensable ignorar tipado para forzar este modo de auth en Vertex
           vertexai: { project: cfg.projectId, location: cfg.location },
           apiKey: cfg.apiKey
       });
-      console.log("Servicios de IA usando Vertex inicializados en proyecto:", cfg.projectId);
+      console.log("Asistente de IA inicializado usando Vertex Express con API Key. Proyecto:", cfg.projectId);
     } catch(e) {
-      console.error("Fallo al iniciar el SDK de IA", e);
+      console.error("Fallo al iniciar el Asistente Vertex IA Express:", e);
     }
   } else {
     ai = null;
-    console.log("Inicialización de Vertex omitida. Faltan configuraciones en el Panel de Admin.");
+    console.log("Inicialización de IA omitida. Faltan configuraciones de Vertex en el Panel de Admin.");
   }
 }
 
-// Inicializar al arrancar el servidor
+// Inicializar al arrancar
 initializeAI();
 
 async function startServer() {
@@ -66,9 +67,9 @@ async function startServer() {
          ...existing, 
          apiKey: apiKey !== undefined ? apiKey : existing.apiKey, 
          projectId: projectId !== undefined ? projectId : existing.projectId, 
-         location: location !== undefined ? location : existing.location 
+         location: location !== undefined ? location : existing.location
      };
-     
+
      fs.writeFileSync(configPath, JSON.stringify(newConfig, null, 2));
      
      // Reinicializar el cliente de Vertex al instante con las nuevas credenciales
@@ -83,89 +84,30 @@ async function startServer() {
 
   app.post("/api/chat", async (req, res) => {
     try {
-      const { message } = req.body;
+      const { message, history } = req.body;
       
       if (!ai) {
-        return res.status(500).json({ reply: "Vertex AI no está configurado. Por favor, configure las credenciales en el Panel de Admin." });
+        return res.status(500).json({ reply: "Vertex AI no está configurado o inicializado. Por favor, configure las credenciales en el Panel de Admin." });
       }
+
+      const contents = history ? history.map((item: any) => ({
+         role: item.role,
+         parts: [{ text: item.content }]
+      })) : [];
+      contents.push({ role: 'user', parts: [{ text: message }] });
 
       const response = await ai.models.generateContent({
         model: "gemini-2.5-flash",
-        contents: `You are an AI consulting assistant for DevTech. You help identify client pain points and propose project solutions based on DevTech's capabilities.
-        
-DevTech offers: 
-1. Intelligent Automation & SaaS
-2. Cloud Architectures
-3. AI Integrations in Healthcare (MediFlex AI)
-4. Rapid Prototyping
-
-Respond briefly, professionally, and in Spanish. Conclude or propose solutions once enough info is gathered.\n\nUser: ${message}`,
+        contents: contents,
+        config: {
+           systemInstruction: "Eres un Asistente Senior experto en planificación y arquitectura de software. Tu objetivo es ayudar y guiar al usuario en la creación, planificación y definición técnica de su proyecto o aplicación de software. Sé profesional, estructurado, constructivo y motivador en español.",
+        }
       });
 
       res.json({ reply: response.text });
-    } catch (error) {
+    } catch (error: any) {
       console.error(error);
-      res.status(500).json({ error: "Internal server error" });
-    }
-  });
-
-  app.post("/api/project-setup", async (req, res) => {
-    try {
-      const { message, projectName } = req.body;
-      
-      if (!ai) {
-        return res.status(500).json({ reply: "Vertex AI no está configurado. Por favor, configure las credenciales en el Panel de Admin." });
-      }
-
-      const response = await ai.models.generateContent({
-        model: "gemini-2.5-flash",
-        contents: `Eres un Arquitecto de Software y Product Manager experto de DevTech. Estás ayudando a un cliente a definir los requerimientos y el alcance de su proyecto llamado "${projectName}".
-        
-Tu objetivo es hacer las preguntas correctas para entender qué quiere lograr, quiénes son los usuarios, qué funcionalidades clave necesita y cómo debería funcionar el MVP.
-Mantén tus respuestas breves, estructuradas y profesionales en español. Si ya tienes suficiente información, propón una lista de historias de usuario o requerimientos técnicos.\n\nUsuario: ${message}`,
-      });
-
-      res.json({ reply: response.text });
-    } catch (error) {
-      console.error(error);
-      res.status(500).json({ error: "Internal server error" });
-    }
-  });
-
-  app.post("/api/estimate-budget", async (req, res) => {
-    try {
-      const { tasks, projectName } = req.body;
-      
-      if (!ai) {
-        return res.status(500).json({ error: "Vertex AI no está configurado. Por favor, configure las credenciales en el Panel de Admin." });
-      }
-
-      if (!tasks || tasks.length === 0) {
-        return res.status(400).json({ error: "No hay tareas para estimar." });
-      }
-
-      const tasksList = tasks.map((t: any) => `- ${t.title}: ${t.description}`).join('\\n');
-
-      const response = await ai.models.generateContent({
-        model: "gemini-2.5-flash",
-        contents: `Eres un Arquitecto de Software y Tech Lead de DevTech. Estás estimando el presupuesto para el proyecto "${projectName}".
-        
-Aquí están las tareas del roadmap actual:
-${tasksList}
-
-Por favor, proporciona una estimación de presupuesto profesional que incluya:
-- Un desglose de las fases principales (ej. Diseño, Desarrollo, Pruebas, Despliegue)
-- Tiempos estimados en horas
-- Un costo aproximado en dólares USD (supón $50 USD por hora, puedes ajustar según complejidad).
-Organiza todo de manera legible en formato Markdown.
-Termina con un rango de costo total estimado en negrita.
-Sé realista y profesional.`,
-      });
-
-      res.json({ estimate: response.text });
-    } catch (error) {
-      console.error(error);
-      res.status(500).json({ error: "Internal server error" });
+      res.status(500).json({ reply: error.message || "Internal server error" });
     }
   });
 

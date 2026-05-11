@@ -3,7 +3,7 @@ import { auth, db } from '../firebase';
 import { doc, getDoc, setDoc, collection, query, where, getDocs, serverTimestamp, onSnapshot } from 'firebase/firestore';
 import { Link } from 'react-router-dom';
 import { handleFirestoreError, OperationType } from '../lib/firestoreUtils';
-import { LogOut, Plus, Settings, Briefcase, FileText } from 'lucide-react';
+import { LogOut, Plus, Settings, Briefcase, FileText, Bot } from 'lucide-react';
 import { ChatModal } from '../components/ChatModal';
 
 export default function Dashboard({ user }: { user: any }) {
@@ -18,9 +18,8 @@ export default function Dashboard({ user }: { user: any }) {
   const [newProjectName, setNewProjectName] = useState('');
   const [phone, setPhone] = useState('');
   const [name, setName] = useState(user?.displayName || '');
-  
-  const [isChatOpen, setIsChatOpen] = useState(false);
   const [showAdminConfig, setShowAdminConfig] = useState(false);
+  const [isChatOpen, setIsChatOpen] = useState(false);
 
   useEffect(() => {
     if (!user) return;
@@ -149,15 +148,14 @@ export default function Dashboard({ user }: { user: any }) {
         <div className="md:col-span-1 space-y-4">
           <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
             <h3 className="font-bold mb-4 uppercase text-xs tracking-widest text-slate-500">Herramientas</h3>
-            {!isAdmin && (
+            {!isAdmin ? (
               <button onClick={() => setIsChatOpen(true)} className="w-full flex items-center gap-3 p-3 text-left rounded-xl hover:bg-indigo-50 text-indigo-700 transition font-medium border border-transparent hover:border-indigo-100">
                 <div className="w-10 h-10 bg-indigo-100 rounded-full flex items-center justify-center">
-                  <Briefcase className="w-5 h-5 text-indigo-600" />
+                  <Bot className="w-5 h-5 text-indigo-600" />
                 </div>
-                Consultor IA
+                Asistente de Proyectos
               </button>
-            )}
-            {isAdmin && (
+            ) : (
               <button 
                 onClick={() => setShowAdminConfig(!showAdminConfig)} 
                 className="w-full flex items-center gap-3 p-3 text-left rounded-xl hover:bg-slate-50 text-slate-700 transition font-medium"
@@ -172,7 +170,6 @@ export default function Dashboard({ user }: { user: any }) {
 
           {isAdmin && showAdminConfig && (
             <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
-               {/* Use the Admin modal UI natively here. Instead of importing the modal, I'll inline the config form. */}
                <AdminConfigForm />
             </div>
           )}
@@ -185,7 +182,7 @@ export default function Dashboard({ user }: { user: any }) {
              <p className="text-slate-500 font-medium">
                {isAdmin 
                  ? 'Panel de administración general de requerimientos y desarrollos globales.' 
-                 : 'Administra tus aplicaciones, supervisa el avance de tus desarrollos y consulta a nuestra IA sobre tus ideas.'}
+                 : 'Administra tus aplicaciones y supervisa el avance de tus desarrollos.'}
              </p>
            </div>
            
@@ -243,7 +240,6 @@ export default function Dashboard({ user }: { user: any }) {
 
       </main>
 
-      {/* Put Chat modal here */}
       <ChatModal isOpen={isChatOpen} onClose={() => setIsChatOpen(false)} />
     </div>
   );
@@ -290,7 +286,7 @@ function AdminConfigForm() {
     <div className="p-5 bg-indigo-50/30">
       <div className="space-y-4">
         <div>
-          <label className="block text-[10px] font-bold text-slate-500 uppercase mb-1">Vertex / Gemini API Key</label>
+          <label className="block text-[10px] font-bold text-slate-500 uppercase mb-1">API Key Vertex AI</label>
           <input 
             type="password" 
             value={adminConfig.apiKey}
@@ -300,21 +296,23 @@ function AdminConfigForm() {
           />
         </div>
         <div>
-          <label className="block text-[10px] font-bold text-slate-500 uppercase mb-1">GCP Project ID</label>
+          <label className="block text-[10px] font-bold text-slate-500 uppercase mb-1">Project ID</label>
           <input 
             type="text" 
             value={adminConfig.projectId}
             onChange={e => setAdminConfig({...adminConfig, projectId: e.target.value})}
             className="w-full px-3 py-2 border rounded-lg text-sm bg-white focus:ring-2 focus:ring-indigo-500 outline-none"
+            placeholder="Ej: innate-temple-492815-q9"
           />
         </div>
         <div>
-          <label className="block text-[10px] font-bold text-slate-500 uppercase mb-1">Location</label>
+          <label className="block text-[10px] font-bold text-slate-500 uppercase mb-1">Vertex Location</label>
           <input 
             type="text" 
             value={adminConfig.location}
             onChange={e => setAdminConfig({...adminConfig, location: e.target.value})}
             className="w-full px-3 py-2 border rounded-lg text-sm bg-white focus:ring-2 focus:ring-indigo-500 outline-none"
+            placeholder="us-central1"
           />
         </div>
         <button 

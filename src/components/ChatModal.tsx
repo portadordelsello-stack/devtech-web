@@ -1,207 +1,117 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { motion, AnimatePresence } from 'motion/react';
-import { X, Send, BrainCircuit, User, Loader2 } from 'lucide-react';
+import React, { useState, useRef, useEffect } from 'react';
+import { X, Send, Bot, User } from 'lucide-react';
+import ReactMarkdown from 'react-markdown';
 
-interface ChatModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-}
-
-interface Message {
-  id: string;
-  role: 'user' | 'ai';
-  text: string;
-  isStreaming?: boolean;
-}
-
-export function ChatModal({ isOpen, onClose }: ChatModalProps) {
-  const [messages, setMessages] = useState<Message[]>([
-    {
-      id: '1',
-      role: 'ai',
-      text: '¡Hola! Soy el asistente de IA de DevTech. Para poder proponerte un plan de acción acorde, cuéntame: ¿Cuáles son los principales cuellos de botella o dolores tecnológicos que enfrenta tu empresa actualmente?'
-    }
-  ]);
-  const [inputMessage, setInputMessage] = useState('');
+export function ChatModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
+  const [messages, setMessages] = useState<{role: 'user'|'model', content: string}[]>([]);
+  const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  };
-
   useEffect(() => {
-    scrollToBottom();
-  }, [messages]);
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [messages, isLoading]);
 
-  const handleSendMessage = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!inputMessage.trim() || isLoading) return;
+  if (!isOpen) return null;
 
-    const userMessage: Message = {
-      id: Date.now().toString(),
-      role: 'user',
-      text: inputMessage.trim(),
-    };
-
-    setMessages((prev) => [...prev, userMessage]);
-    setInputMessage('');
+  const sendMessage = async () => {
+    if (!input.trim() || isLoading) return;
+    
+    const userMessage = input.trim();
+    setInput('');
+    const newMessages = [...messages, { role: 'user' as const, content: userMessage }];
+    setMessages(newMessages);
     setIsLoading(true);
 
     try {
-      const response = await fetch('/api/chat', {
+      const res = await fetch('/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message: userMessage.text }),
+        body: JSON.stringify({ message: userMessage, history: messages })
       });
-
-      if (!response.ok) throw new Error('Error al enviar el mensaje');
-
-      const data = await response.json();
-      
-      const aiMessage: Message = {
-        id: (Date.now() + 1).toString(),
-        role: 'ai',
-        text: data.reply,
-      };
-
-      setMessages((prev) => [...prev, aiMessage]);
+      const data = await res.json();
+      setMessages([...newMessages, { role: 'model', content: data.reply || data.error }]);
     } catch (error) {
-      console.error('Error:', error);
-      const errorMessage: Message = {
-        id: (Date.now() + 1).toString(),
-        role: 'ai',
-        text: 'Lo siento, hubo un error al procesar tu solicitud. Por favor, intenta de nuevo.',
-      };
-      setMessages((prev) => [...prev, errorMessage]);
+      setMessages([...newMessages, { role: 'model', content: "Hubo un error de conexión." }]);
     } finally {
       setIsLoading(false);
     }
   };
 
   return (
-    <AnimatePresence>
-      {isOpen && (
-        <>
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4 sm:p-6"
-            onClick={onClose}
-          >
-            <motion.div
-              initial={{ opacity: 0, y: 30, scale: 0.95 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={{ opacity: 0, y: 20, scale: 0.95 }}
-              transition={{ type: "spring", damping: 25, stiffness: 300 }}
-              onClick={(e) => e.stopPropagation()}
-              className="w-full max-w-3xl h-[85vh] sm:h-[80vh] bg-white rounded-3xl shadow-2xl flex flex-col overflow-hidden"
+    <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex justify-center items-center p-4">
+      <div className="bg-white rounded-2xl w-full max-w-2xl h-[80vh] flex flex-col shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+        <div className="p-4 border-b border-slate-100 flex justify-between items-center bg-slate-50">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 bg-indigo-100 rounded-full flex items-center justify-center">
+              <Bot className="w-5 h-5 text-indigo-600" />
+            </div>
+            <div>
+               <h3 className="font-bold text-slate-800">Asistente de Proyectos</h3>
+               <p className="text-xs text-slate-500">Impulsado por Vertex AI Express</p>
+            </div>
+          </div>
+          <button onClick={onClose} className="p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-200 rounded-full transition">
+            <X className="w-5 h-5" />
+          </button>
+        </div>
+
+        <div className="flex-1 overflow-y-auto p-4 space-y-6">
+          {messages.length === 0 && (
+            <div className="text-center text-slate-400 mt-10">
+               <Bot className="w-12 h-12 mx-auto mb-3 opacity-20" />
+               <p>¡Hola! Soy tu asistente para la creación de proyectos.</p>
+               <p className="text-sm mt-1 text-slate-400">Cuéntame tu idea y te ayudaré a definirla y estructurarla técnicamente.</p>
+            </div>
+          )}
+          {messages.map((msg, idx) => (
+            <div key={idx} className={`flex gap-3 ${msg.role === 'user' ? 'flex-row-reverse' : ''}`}>
+              <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${msg.role === 'user' ? 'bg-slate-800 text-white' : 'bg-indigo-100 text-indigo-600'}`}>
+                {msg.role === 'user' ? <User className="w-4 h-4" /> : <Bot className="w-4 h-4" />}
+              </div>
+              <div className={`max-w-[80%] rounded-2xl p-4 ${msg.role === 'user' ? 'bg-slate-800 text-white' : 'bg-slate-100 text-slate-800'}`}>
+                  <div className={`prose prose-sm max-w-none ${msg.role === 'user' ? 'prose-invert prose-p:text-white prose-li:text-white' : ''}`}>
+                    <ReactMarkdown>{msg.content}</ReactMarkdown>
+                  </div>
+              </div>
+            </div>
+          ))}
+          {isLoading && (
+            <div className="flex gap-3">
+              <div className="w-8 h-8 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center">
+                <Bot className="w-4 h-4" />
+              </div>
+              <div className="bg-slate-100 text-slate-500 rounded-2xl p-4 flex gap-1 items-center">
+                 <div className="w-2 h-2 rounded-full bg-slate-300 animate-bounce"></div>
+                 <div className="w-2 h-2 rounded-full bg-slate-300 animate-bounce" style={{animationDelay: '0.2s'}}></div>
+                 <div className="w-2 h-2 rounded-full bg-slate-300 animate-bounce" style={{animationDelay: '0.4s'}}></div>
+              </div>
+            </div>
+          )}
+          <div ref={messagesEndRef} />
+        </div>
+
+        <div className="p-4 border-t border-slate-100 bg-white">
+          <div className="relative flex items-center">
+            <input 
+              type="text"
+              value={input}
+              onChange={e => setInput(e.target.value)}
+              onKeyDown={e => e.key === 'Enter' && sendMessage()}
+              placeholder="Escribe tu mensaje..."
+              className="w-full pl-4 pr-12 py-3 bg-slate-50 border border-slate-200 rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition"
+              disabled={isLoading}
+            />
+            <button 
+              onClick={sendMessage}
+              disabled={!input.trim() || isLoading}
+              className="absolute right-2 p-2 bg-indigo-600 text-white rounded-full hover:bg-indigo-700 disabled:opacity-50 disabled:bg-slate-400 disabled:hover:bg-slate-400 transition"
             >
-              {/* Header */}
-              <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 bg-white">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-black rounded-xl flex items-center justify-center">
-                    <BrainCircuit className="w-5 h-5 text-white" />
-                  </div>
-                  <div>
-                    <h3 className="font-bold text-gray-900 tracking-tight leading-none mb-1">
-                      DevTech Discovery AI
-                    </h3>
-                    <p className="text-[11px] text-gray-500 font-medium uppercase tracking-widest">
-                      Análisis Inicial
-                    </p>
-                  </div>
-                </div>
-                <button
-                  onClick={onClose}
-                  className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-50 rounded-full transition-colors"
-                >
-                  <X className="w-5 h-5" />
-                </button>
-              </div>
-
-              {/* Chat Area */}
-              <div className="flex-1 overflow-y-auto p-6 bg-gray-50/50">
-                <div className="flex flex-col gap-6">
-                  {messages.map((msg) => (
-                    <motion.div
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      key={msg.id}
-                      className={`flex gap-4 ${msg.role === 'user' ? 'flex-row-reverse' : ''}`}
-                    >
-                      <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 mt-1 ${
-                        msg.role === 'user' ? 'bg-blue-600' : 'bg-black'
-                      }`}>
-                        {msg.role === 'user' ? (
-                          <User className="w-4 h-4 text-white" />
-                        ) : (
-                          <BrainCircuit className="w-4 h-4 text-white" />
-                        )}
-                      </div>
-                      <div className={`max-w-[85%] sm:max-w-[75%] rounded-2xl px-5 py-3.5 text-sm ${
-                        msg.role === 'user'
-                          ? 'bg-blue-600 text-white rounded-tr-none shadow-sm shadow-blue-600/10'
-                          : 'bg-white text-gray-800 rounded-tl-none shadow-sm border border-gray-100'
-                      }`}>
-                        {msg.text.split('\n').map((line, i) => (
-                          <span key={i}>
-                            {line}
-                            <br />
-                          </span>
-                        ))}
-                      </div>
-                    </motion.div>
-                  ))}
-                  {isLoading && (
-                    <motion.div
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      className="flex gap-4"
-                    >
-                      <div className="w-8 h-8 rounded-full bg-black flex items-center justify-center flex-shrink-0 mt-1">
-                        <BrainCircuit className="w-4 h-4 text-white" />
-                      </div>
-                      <div className="bg-white rounded-2xl rounded-tl-none px-5 py-4 shadow-sm border border-gray-100 flex items-center gap-2">
-                        <Loader2 className="w-4 h-4 text-gray-400 animate-spin" />
-                        <span className="text-sm text-gray-500 font-medium">Analizando requerimientos...</span>
-                      </div>
-                    </motion.div>
-                  )}
-                  <div ref={messagesEndRef} />
-                </div>
-              </div>
-
-              {/* Input Area */}
-              <div className="p-4 sm:p-6 bg-white border-t border-gray-100">
-                <form onSubmit={handleSendMessage} className="relative flex items-center">
-                  <input
-                    type="text"
-                    value={inputMessage}
-                    onChange={(e) => setInputMessage(e.target.value)}
-                    placeholder="Describe los problemas o desafíos de tu empresa..."
-                    className="w-full bg-gray-50 border border-gray-200 text-gray-900 text-sm rounded-full pl-6 pr-14 py-4 focus:outline-none focus:ring-2 focus:ring-black/5 focus:border-gray-300 transition-all font-medium placeholder:text-gray-400"
-                    disabled={isLoading}
-                  />
-                  <button
-                    type="submit"
-                    disabled={!inputMessage.trim() || isLoading}
-                    className="absolute right-2 p-2.5 bg-black text-white rounded-full hover:bg-gray-800 disabled:opacity-50 disabled:hover:bg-black transition-colors"
-                  >
-                    <Send className="w-4 h-4" />
-                  </button>
-                </form>
-                <div className="text-center mt-3">
-                   <span className="text-[10px] text-gray-400 font-medium uppercase tracking-widest">
-                     Al chatear, la IA de DevTech generará un Brief de Proyecto automatizado
-                   </span>
-                </div>
-              </div>
-            </motion.div>
-          </motion.div>
-        </>
-      )}
-    </AnimatePresence>
+              <Send className="w-4 h-4" />
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
   );
 }
