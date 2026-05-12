@@ -62,7 +62,7 @@ service cloud.firestore {
         && incoming().createdAt == request.time
         && incoming().updatedAt == request.time
         // Strict key check
-        && incoming().keys().hasOnly(['name', 'ownerId', 'status', 'createdAt', 'updatedAt', 'requirementsChat', 'tasks', 'budgetEstimate', 'mindmapNodes', 'mindmapEdges', 'chatHistory']);
+        && incoming().keys().hasOnly(['name', 'ownerId', 'status', 'createdAt', 'updatedAt', 'requirementsChat', 'tasks', 'budgetEstimate', 'mindmapNodes', 'mindmapEdges', 'chatHistory', 'businessModelCanvas']);
       allow update: if isSignedIn() 
         && (existing().ownerId == request.auth.uid || isAdmin())
         && isValidProject(incoming())
@@ -71,7 +71,7 @@ service cloud.firestore {
         && incoming().ownerId == existing().ownerId // immutable
         && (
             isAdmin() || 
-            (incoming().diff(existing()).affectedKeys().hasOnly(['name', 'status', 'updatedAt', 'requirementsChat', 'tasks', 'budgetEstimate', 'mindmapNodes', 'mindmapEdges', 'chatHistory']))
+            (incoming().diff(existing()).affectedKeys().hasOnly(['name', 'status', 'updatedAt', 'requirementsChat', 'tasks', 'budgetEstimate', 'mindmapNodes', 'mindmapEdges', 'chatHistory', 'businessModelCanvas']))
            );
       allow delete: if isAdmin() || (isSignedIn() && existing().ownerId == request.auth.uid);
     }

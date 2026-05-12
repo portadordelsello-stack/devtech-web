@@ -2,7 +2,7 @@ import express from "express";
 import { createServer as createViteServer } from "vite";
 import path from "path";
 import fs from "fs";
-import { GoogleGenAI } from '@google/genai';
+import { GoogleGenAI, Type } from '@google/genai';
 
 let ai: GoogleGenAI | null = null;
 const configPath = path.join(process.cwd(), 'system-config.json');
@@ -100,11 +100,46 @@ async function startServer() {
         model: "gemini-2.5-flash",
         contents: contents,
         config: {
-           systemInstruction: "Eres un Asistente Senior experto en planificación y arquitectura de software. Tu objetivo es ayudar y guiar al usuario en la creación, planificación y definición técnica de su proyecto o aplicación de software. Sé profesional, estructurado, constructivo y motivador en español.",
+           systemInstruction: "Eres un Asistente Senior experto en planificación y modelos de negocio. Tu objetivo es ayudar y guiar al usuario en la creación, planificación y definición de su proyecto usando un Business Model Canvas. Sé profesional, estructurado, constructivo y motivador en español. IMPORTANTE: Extrae la información de la conversación y usa la herramienta 'updateBusinessModelCanvas' para actualizar el modelo en tiempo real.",
+           tools: [{
+             functionDeclarations: [
+               {
+                 name: "updateBusinessModelCanvas",
+                 description: "Actualiza el Business Model Canvas del proyecto con la información extraída de la conversación",
+                 parameters: {
+                   type: Type.OBJECT,
+                   properties: {
+                     customerSegments: { type: Type.ARRAY, items: { type: Type.STRING } },
+                     valuePropositions: { type: Type.ARRAY, items: { type: Type.STRING } },
+                     channels: { type: Type.ARRAY, items: { type: Type.STRING } },
+                     customerRelationships: { type: Type.ARRAY, items: { type: Type.STRING } },
+                     revenueStreams: { type: Type.ARRAY, items: { type: Type.STRING } },
+                     keyResources: { type: Type.ARRAY, items: { type: Type.STRING } },
+                     keyActivities: { type: Type.ARRAY, items: { type: Type.STRING } },
+                     keyPartnerships: { type: Type.ARRAY, items: { type: Type.STRING } },
+                     costStructure: { type: Type.ARRAY, items: { type: Type.STRING } }
+                   }
+                 }
+               }
+             ]
+           }]
         }
       });
 
-      res.json({ reply: response.text });
+      let reply = response.text || "";
+      let canvasUpdate = undefined;
+
+      if (response.functionCalls && response.functionCalls.length > 0) {
+        const fc = response.functionCalls[0];
+        if (fc.name === 'updateBusinessModelCanvas') {
+           canvasUpdate = fc.args;
+           if (!reply) {
+             reply = "¡He actualizado el Business Model Canvas basándome en lo que conversamos! Revísalo en la pantalla.";
+           }
+        }
+      }
+
+      res.json({ reply, canvasUpdate });
     } catch (error: any) {
       console.error(error);
       res.status(500).json({ reply: error.message || "Internal server error" });

@@ -5,7 +5,7 @@ import { doc, getDoc, updateDoc, serverTimestamp } from 'firebase/firestore';
 import { handleFirestoreError, OperationType } from '../lib/firestoreUtils';
 import { Bot, ArrowLeft, BrainCircuit, CheckSquare, DollarSign, Send, User, Loader2, Save, Network, Check, Info, X } from 'lucide-react';
 import { ChatWidget } from '../components/ChatModal';
-import { MindMapComponent } from '../components/mindmap/MindMap';
+import { BusinessModelCanvas } from '../components/BusinessModelCanvas';
 
 type TaskStatus = 'backlog' | 'todo' | 'inprogress' | 'done';
 
@@ -22,7 +22,8 @@ export default function ProjectDetail({ user }: { user: any }) {
   const isAdmin = user?.email === 'portadordelsello@gmail.com';
   const [project, setProject] = useState<any>(null);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<'mindmap' | 'budget' | 'admin'>('mindmap');
+  const [activeTab, setActiveTab] = useState<'canvas' | 'budget' | 'admin'>('canvas');
+  const [isUpdatingCanvas, setIsUpdatingCanvas] = useState(false);
   const [showGuide, setShowGuide] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
 
@@ -56,7 +57,7 @@ export default function ProjectDetail({ user }: { user: any }) {
           navigate('/dashboard');
         }
       } catch (error) {
-        handleFirestoreError(error, OperationType.GET, `projects/${id}`);
+        handleFirestoreError(error, OperationType.GET, `projects/${id}`, auth);
       } finally {
         setLoading(false);
       }
@@ -74,6 +75,23 @@ export default function ProjectDetail({ user }: { user: any }) {
       });
     } catch (error) {
       console.error("Error saving chat history", error);
+    }
+  };
+
+  const handleCanvasUpdate = async (canvasData: any) => {
+    if (!id || !project) return;
+    setIsUpdatingCanvas(true);
+    const newProject = { ...project, businessModelCanvas: canvasData };
+    setProject(newProject);
+    try {
+      await updateDoc(doc(db, 'projects', id), {
+        businessModelCanvas: canvasData,
+        updatedAt: serverTimestamp()
+      });
+    } catch (error) {
+      console.error("Error saving canvas data", error);
+    } finally {
+      setIsUpdatingCanvas(false);
     }
   };
 
@@ -179,14 +197,14 @@ export default function ProjectDetail({ user }: { user: any }) {
             <h3 className="font-bold mb-4 uppercase text-[10px] tracking-widest text-slate-500">Módulos Activos</h3>
             
             <button 
-              onClick={() => setActiveTab('mindmap')}
+              onClick={() => setActiveTab('canvas')}
               className={`w-full flex items-center gap-3 p-3 rounded-xl transition font-medium text-sm border mt-1 ${
-                activeTab === 'mindmap' 
+                activeTab === 'canvas' 
                   ? 'bg-indigo-50 border-indigo-100 text-indigo-700' 
                   : 'bg-transparent border-transparent text-slate-600 hover:bg-slate-50'
               }`}
             >
-              <Network className="w-4 h-4" /> Mind Map
+              <Network className="w-4 h-4" /> Canvas
             </button>
 
             <button 
@@ -220,47 +238,32 @@ export default function ProjectDetail({ user }: { user: any }) {
                subtitle="Impulsado por Vertex AI"
                initialMessages={project?.chatHistory || []}
                onMessagesChange={handleChatMessagesChange}
+               onCanvasUpdate={handleCanvasUpdate}
              />
           </div>
         </div>
 
         {/* Content Area */}
         <div className="flex-1 bg-white rounded-2xl shadow-sm border border-slate-200 flex flex-col h-[75vh] min-h-[500px]">
-          {activeTab === 'mindmap' && (
+          {activeTab === 'canvas' && (
             <div className={isFullscreen ? "fixed inset-0 z-50 bg-white p-6 flex flex-col shadow-2xl" : "flex-1 flex flex-col p-6 bg-slate-50/50 rounded-2xl overflow-hidden"}>
               <div className="flex items-center justify-between mb-6">
                 <div>
                   <div className="flex items-center gap-2">
-                    <h3 className="text-xl font-bold">Mind Map del Proyecto</h3>
-                    <button onClick={() => setShowGuide(true)} className="p-1.5 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-full transition" title="Guía del Mind Map">
+                    <h3 className="text-xl font-bold">Business Model Canvas</h3>
+                    <button onClick={() => setShowGuide(true)} className="p-1.5 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-full transition" title="Acerca del Canvas">
                       <Info className="w-5 h-5" />
                     </button>
                   </div>
-                  <p className="text-slate-500 text-sm">Visualiza la estructura y estado de las tareas de manera conectada.</p>
+                  <p className="text-slate-500 text-sm">Visualiza tu modelo de negocio de forma clara. Pide al Asistente que lo vaya llenando por ti.</p>
                 </div>
-                {/* Fullscreen toggle inside header if wanted, or in map. Putting it in map controls is better */}
               </div>
               
               <div className="flex-1 overflow-hidden bg-[#fafafa] rounded-xl border border-slate-200 relative shadow-inner">
-                 <MindMapComponent 
-                    projectId={project.id} 
-                    savedNodes={project.mindmapNodes} 
-                    savedEdges={project.mindmapEdges} 
+                  <BusinessModelCanvas 
+                    data={project?.businessModelCanvas} 
+                    isGenerating={isUpdatingCanvas}
                   />
-              </div>
-
-              {/* Form for new tasks */}
-              <div className="mt-4 flex gap-2 w-full pt-4 border-t border-slate-200/50 shrink-0">
-                 <form onSubmit={handleCreateTask} className="w-full flex gap-2">
-                   <input 
-                     type="text" 
-                     value={newTaskTitle}
-                     onChange={(e) => setNewTaskTitle(e.target.value)}
-                     placeholder="+ Añadir nueva tarea al Backlog..." 
-                     className="text-sm bg-white border border-slate-200 rounded-xl px-4 py-3 w-full focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-400 transition"
-                   />
-                   <button type="submit" disabled={!newTaskTitle.trim()} className="bg-indigo-600 text-white px-6 py-3 rounded-xl hover:bg-indigo-700 disabled:opacity-50 transition font-medium whitespace-nowrap">Añadir</button>
-                 </form>
               </div>
             </div>
           )}

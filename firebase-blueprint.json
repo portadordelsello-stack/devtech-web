@@ -28,7 +28,8 @@
         "chatHistory": { "type": "array" },
         "tasks": { "type": "array" },
         "requirementsChat": { "type": "string" },
-        "budgetEstimate": { "type": "string" }
+        "budgetEstimate": { "type": "string" },
+        "businessModelCanvas": { "type": "object" }
       },
       "required": ["name", "ownerId", "status", "createdAt", "updatedAt"]
     }

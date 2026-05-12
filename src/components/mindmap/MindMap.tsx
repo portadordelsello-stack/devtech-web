@@ -13,7 +13,7 @@ import ReactFlow, {
 } from 'reactflow';
 import 'reactflow/dist/style.css';
 import { doc, updateDoc, serverTimestamp } from 'firebase/firestore';
-import { db } from '../../firebase';
+import { db, auth } from '../../firebase';
 import { handleFirestoreError, OperationType } from '../../lib/firestoreUtils';
 import { Save, Plus } from 'lucide-react';
 import { EditableNode } from './EditableNode';
@@ -97,7 +97,7 @@ export function MindMapComponent({ projectId, savedNodes, savedEdges }: { projec
         updatedAt: serverTimestamp()
       });
     } catch (error) {
-      handleFirestoreError(error, OperationType.UPDATE, `projects/${projectId}`);
+      handleFirestoreError(error, OperationType.UPDATE, `projects/${projectId}`, auth);
     } finally {
       setIsSaving(false);
     }

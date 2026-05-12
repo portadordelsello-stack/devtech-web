@@ -8,14 +8,16 @@ export function ChatWidget({
   showClose = false, 
   onClose,
   initialMessages = [],
-  onMessagesChange
+  onMessagesChange,
+  onCanvasUpdate
 }: { 
   title?: string, 
   subtitle?: string, 
   showClose?: boolean, 
   onClose?: () => void,
   initialMessages?: {role: 'user'|'model', content: string}[],
-  onMessagesChange?: (messages: {role: 'user'|'model', content: string}[]) => void
+  onMessagesChange?: (messages: {role: 'user'|'model', content: string}[]) => void,
+  onCanvasUpdate?: (canvasData: any) => void
 }) {
   const [messages, setMessages] = useState<{role: 'user'|'model', content: string}[]>(initialMessages);
   const [input, setInput] = useState('');
@@ -46,6 +48,10 @@ export function ChatWidget({
       const finalMessages = [...newMessages, { role: 'model' as const, content: data.reply || data.error }];
       setMessages(finalMessages);
       if (onMessagesChange) onMessagesChange(finalMessages);
+      
+      if (data.canvasUpdate && onCanvasUpdate) {
+         onCanvasUpdate(data.canvasUpdate);
+      }
     } catch (error) {
       const errorMessages = [...newMessages, { role: 'model' as const, content: "Hubo un error de conexión." }];
       setMessages(errorMessages);
@@ -137,19 +143,21 @@ export function ChatModal({
   isOpen, 
   onClose,
   initialMessages = [],
-  onMessagesChange 
+  onMessagesChange,
+  onCanvasUpdate
 }: { 
   isOpen: boolean; 
   onClose: () => void;
   initialMessages?: {role: 'user'|'model', content: string}[];
   onMessagesChange?: (messages: {role: 'user'|'model', content: string}[]) => void;
+  onCanvasUpdate?: (canvasData: any) => void;
 }) {
   if (!isOpen) return null;
 
   return (
     <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex justify-center items-center p-4">
       <div className="bg-white rounded-2xl w-full max-w-2xl h-[80vh] shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
-         <ChatWidget showClose={true} onClose={onClose} initialMessages={initialMessages} onMessagesChange={onMessagesChange} />
+         <ChatWidget showClose={true} onClose={onClose} initialMessages={initialMessages} onMessagesChange={onMessagesChange} onCanvasUpdate={onCanvasUpdate} />
       </div>
     </div>
   );
