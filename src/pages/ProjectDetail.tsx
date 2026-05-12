@@ -458,48 +458,55 @@ export default function ProjectDetail({ user }: { user: any }) {
                     <Info className="w-5 h-5" />
                   </div>
                   <div>
-                    <h3 className="font-bold text-slate-800">Guía del Mind Map</h3>
-                    <p className="text-sm text-slate-500">¿Qué significan estas categorías?</p>
+                    <h3 className="font-bold text-slate-800">Ayuda de Canvas</h3>
+                    <p className="text-sm text-slate-500">¿Qué es el Business Model Canvas?</p>
                   </div>
                 </div>
                 <button onClick={() => setShowGuide(false)} className="p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-200 rounded-full transition">
                   <X className="w-5 h-5" />
                 </button>
              </div>
-             <div className="p-6 overflow-y-auto max-h-[60vh]">
+             <div className="p-6 overflow-y-auto max-h-[60vh] custom-scrollbar">
                <div className="space-y-6 text-sm text-slate-700">
-                 <p>Estas cuatro categorías forman la estructura básica de un tablero Kanban o de gestión de proyectos ágiles. Representan el flujo de trabajo desde que surge una idea hasta que se completa.</p>
+                 <p>El Business Model Canvas es una herramienta estratégica utilizada para definir y comunicar rápidamente y de manera visual una idea o concepto de negocio. Se compone de 9 bloques fundamentales:</p>
                  
-                 <div className="bg-slate-50 p-4 rounded-xl border border-slate-100">
-                    <h4 className="font-bold text-slate-900 mb-1 flex items-center gap-2">
-                       <div className="w-2 h-2 rounded-full bg-slate-400"></div>
-                       Reserva (Backlog)
-                    </h4>
-                    <p className="text-slate-600">Es el repositorio central de todas las tareas, ideas, requisitos y correcciones que podrían realizarse en el futuro. No son tareas activas, sino una lista priorizada de lo que está "en espera".</p>
-                 </div>
-
-                 <div className="bg-indigo-50/50 p-4 rounded-xl border border-indigo-50">
-                    <h4 className="font-bold text-indigo-900 mb-1 flex items-center gap-2">
-                       <div className="w-2 h-2 rounded-full bg-indigo-400"></div>
-                       Por hacer (To Do)
-                    </h4>
-                    <p className="text-slate-600">Contiene las tareas seleccionadas del backlog que el equipo se ha comprometido a realizar en el ciclo actual (como un sprint). Representa el trabajo listo para ser iniciado.</p>
-                 </div>
-
-                 <div className="bg-amber-50 p-4 rounded-xl border border-amber-100">
-                    <h4 className="font-bold text-amber-900 mb-1 flex items-center gap-2">
-                       <div className="w-2 h-2 rounded-full bg-amber-400"></div>
-                       En curso (In Progress)
-                    </h4>
-                    <p className="text-slate-600">Tareas que se están ejecutando activamente en este momento. Ayuda a visualizar la carga de trabajo real y a identificar posibles cuellos de botella.</p>
-                 </div>
-
-                 <div className="bg-emerald-50 p-4 rounded-xl border border-emerald-100">
-                    <h4 className="font-bold text-emerald-900 mb-1 flex items-center gap-2">
-                       <div className="w-2 h-2 rounded-full bg-emerald-400"></div>
-                       Hecho (Done)
-                    </h4>
-                    <p className="text-slate-600">Tareas que han cumplido con todos los criterios de calidad y están terminadas. Una vez aquí, el trabajo se considera entregable o cerrado.</p>
+                 <div className="bg-slate-50 p-4 rounded-xl border border-slate-200 grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-1">
+                      <h4 className="font-bold text-slate-900">Segmentos de Cliente</h4>
+                      <p className="text-slate-600 text-xs">¿Para quién creamos valor? ¿Cuáles son nuestros clientes más importantes?</p>
+                    </div>
+                    <div className="space-y-1">
+                      <h4 className="font-bold text-slate-900">Propuestas de Valor</h4>
+                      <p className="text-slate-600 text-xs">¿Qué valor entregamos al cliente? ¿Qué problema ayudamos a resolver?</p>
+                    </div>
+                    <div className="space-y-1">
+                      <h4 className="font-bold text-slate-900">Canales</h4>
+                      <p className="text-slate-600 text-xs">¿Cómo alcanzamos a nuestros Segmentos de Clientes para entregar la Propuesta de Valor?</p>
+                    </div>
+                    <div className="space-y-1">
+                      <h4 className="font-bold text-slate-900">Relaciones Cliente</h4>
+                      <p className="text-slate-600 text-xs">¿Qué tipo de relación espera cada Segmento de Clientes que establezcamos y mantengamos con ellos?</p>
+                    </div>
+                    <div className="space-y-1">
+                      <h4 className="font-bold text-slate-900">Fuentes de Ingresos</h4>
+                      <p className="text-slate-600 text-xs">¿Por qué valor están dispuestos a pagar realmente nuestros clientes?</p>
+                    </div>
+                    <div className="space-y-1">
+                      <h4 className="font-bold text-slate-900">Recursos Clave</h4>
+                      <p className="text-slate-600 text-xs">¿Qué recursos físicos, financieros, intelectuales o humanos requiere nuestra Propuesta de Valor?</p>
+                    </div>
+                    <div className="space-y-1">
+                      <h4 className="font-bold text-slate-900">Actividades Clave</h4>
+                      <p className="text-slate-600 text-xs">¿Qué acciones críticas debemos realizar para operar con éxito?</p>
+                    </div>
+                    <div className="space-y-1">
+                      <h4 className="font-bold text-slate-900">Socios Clave</h4>
+                      <p className="text-slate-600 text-xs">¿Quiénes son nuestros socios y proveedores clave? ¿Qué recursos o actividades adquirimos de ellos?</p>
+                    </div>
+                    <div className="space-y-1 md:col-span-2">
+                      <h4 className="font-bold text-slate-900">Estructura de Costos</h4>
+                      <p className="text-slate-600 text-xs">¿Cuáles son los costos más importantes inherentes a nuestro modelo de negocio?</p>
+                    </div>
                  </div>
                </div>
              </div>
