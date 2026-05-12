@@ -81,11 +81,28 @@ export default function ProjectDetail({ user }: { user: any }) {
   const handleCanvasUpdate = async (canvasData: any) => {
     if (!id || !project) return;
     setIsUpdatingCanvas(true);
-    const newProject = { ...project, businessModelCanvas: canvasData };
+    
+    // Merge new canvas data with existing to prevent overwriting
+    const currentCanvas = project.businessModelCanvas || {};
+    const mergedCanvas = { ...currentCanvas };
+    
+    if (canvasData) {
+      Object.keys(canvasData).forEach(key => {
+        if (Array.isArray(canvasData[key])) {
+          const existing = currentCanvas[key] || [];
+          const newItems = canvasData[key];
+          mergedCanvas[key] = Array.from(new Set([...existing, ...newItems]));
+        } else {
+          mergedCanvas[key] = canvasData[key];
+        }
+      });
+    }
+
+    const newProject = { ...project, businessModelCanvas: mergedCanvas };
     setProject(newProject);
     try {
       await updateDoc(doc(db, 'projects', id), {
-        businessModelCanvas: canvasData,
+        businessModelCanvas: mergedCanvas,
         updatedAt: serverTimestamp()
       });
     } catch (error) {
