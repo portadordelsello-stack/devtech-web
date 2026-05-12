@@ -3,7 +3,7 @@ import { useParams, Link, useNavigate } from 'react-router-dom';
 import { auth, db } from '../firebase';
 import { doc, getDoc, updateDoc, serverTimestamp } from 'firebase/firestore';
 import { handleFirestoreError, OperationType } from '../lib/firestoreUtils';
-import { Bot, ArrowLeft, BrainCircuit, CheckSquare, DollarSign, Send, User, Loader2, Save, Network, Check, Info, X, Trash2 } from 'lucide-react';
+import { Bot, ArrowLeft, BrainCircuit, CheckSquare, DollarSign, Send, User, Loader2, Save, Network, Check, Info, X, Trash2, Maximize2, Minimize2 } from 'lucide-react';
 import { ChatWidget } from '../components/ChatModal';
 import { BusinessModelCanvas } from '../components/BusinessModelCanvas';
 
@@ -289,6 +289,9 @@ export default function ProjectDetail({ user }: { user: any }) {
                     <h3 className="text-xl font-bold">Business Model Canvas</h3>
                     <button onClick={() => setShowGuide(true)} className="p-1.5 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-full transition" title="Acerca del Canvas">
                       <Info className="w-5 h-5" />
+                    </button>
+                    <button onClick={() => setIsFullscreen(!isFullscreen)} className="p-1.5 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-full transition" title={isFullscreen ? "Contraer Canvas" : "Expandir Canvas"}>
+                      {isFullscreen ? <Minimize2 className="w-5 h-5" /> : <Maximize2 className="w-5 h-5" />}
                     </button>
                     <button onClick={handleClearCanvas} className="p-1.5 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-full transition" title="Limpiar Canvas">
                       <Trash2 className="w-5 h-5" />
