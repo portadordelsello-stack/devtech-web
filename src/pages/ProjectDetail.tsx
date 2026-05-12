@@ -228,7 +228,8 @@ export default function ProjectDetail({ user }: { user: any }) {
                     initialScale={0.9}
                     minScale={0.2}
                     maxScale={4}
-                    centerOnInit={false}
+                    centerOnInit={true}
+                    limitToBounds={false}
                     wheel={{ step: 0.1 }}
                  >
                    {({ zoomIn, zoomOut, resetTransform }) => (
@@ -248,7 +249,7 @@ export default function ProjectDetail({ user }: { user: any }) {
                            {isFullscreen ? <Shrink className="w-5 h-5" /> : <Expand className="w-5 h-5" />}
                          </button>
                        </div>
-                       <TransformComponent wrapperClass="w-full h-full cursor-grab active:cursor-grabbing" contentClass="p-16 min-w-max flex items-center justify-start">
+                       <TransformComponent wrapperClass="w-full h-full cursor-grab active:cursor-grabbing" contentClass="p-32 w-max min-w-full flex items-center justify-start">
                          <div className="flex items-center gap-12">
                             {/* Root Node */}
                     <div className="bg-indigo-600 text-white font-bold px-6 py-4 rounded-2xl shadow-sm border border-indigo-700 w-48 text-center shrink-0 z-10 relative">
