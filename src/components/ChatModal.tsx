@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { X, Send, Bot, User } from 'lucide-react';
+import { X, Send, Bot, User, Trash2, Download } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 
 export function ChatWidget({ 
@@ -27,6 +27,26 @@ export function ChatWidget({
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages, isLoading]);
+
+  const handleDownloadChat = () => {
+    const textContent = messages.map(msg => `${msg.role === 'user' ? 'Tú' : 'Asistente'}: ${msg.content}`).join('\n\n');
+    const blob = new Blob([textContent], { type: 'text/plain;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `chat-export.txt`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  };
+
+  const handleResetChat = () => {
+    if (confirm('¿Estás seguro de que quieres borrar el historial del chat?')) {
+        setMessages([]);
+        if (onMessagesChange) onMessagesChange([]);
+    }
+  };
 
   const sendMessage = async () => {
     if (!input.trim() || isLoading) return;
@@ -73,11 +93,19 @@ export function ChatWidget({
                <p className="text-[10px] text-slate-500">{subtitle}</p>
             </div>
           </div>
-          {showClose && onClose && (
-            <button onClick={onClose} className="p-1.5 text-slate-400 hover:text-slate-600 hover:bg-slate-200 rounded-full transition">
-              <X className="w-4 h-4" />
+          <div className="flex items-center gap-1">
+            <button onClick={handleDownloadChat} className="p-1.5 text-slate-400 hover:text-indigo-600 hover:bg-slate-200 rounded-full transition" title="Descargar Chat">
+              <Download className="w-4 h-4" />
             </button>
-          )}
+            <button onClick={handleResetChat} className="p-1.5 text-slate-400 hover:text-red-600 hover:bg-slate-200 rounded-full transition" title="Resetear Chat">
+              <Trash2 className="w-4 h-4" />
+            </button>
+            {showClose && onClose && (
+              <button onClick={onClose} className="p-1.5 text-slate-400 hover:text-slate-600 hover:bg-slate-200 rounded-full transition">
+                <X className="w-4 h-4" />
+              </button>
+            )}
+          </div>
         </div>
 
         <div className="flex-1 overflow-y-auto p-4 space-y-4 custom-scrollbar">
