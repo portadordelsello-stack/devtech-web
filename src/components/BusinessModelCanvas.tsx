@@ -24,12 +24,20 @@ export function BusinessModelCanvas({ data, isGenerating }: { data?: BMCData, is
     'bg-violet-100 hover:bg-violet-200 border-violet-200 text-violet-900',
   ];
 
+  const getColorForItem = (item: string) => {
+    let hash = 0;
+    for (let i = 0; i < item.length; i++) {
+        hash = item.charCodeAt(i) + ((hash << 5) - hash);
+    }
+    return colors[Math.abs(hash) % colors.length];
+  };
+
   const renderList = (items?: string[], sectionTitle?: string) => {
     if (!items || items.length === 0) return <p className="text-slate-400 text-xs italic">Aún sin definir</p>;
     return (
       <div className="flex flex-wrap gap-2">
          {items.map((item, i) => {
-            const colorClass = colors[i % colors.length];
+            const colorClass = getColorForItem(item);
             // Remove hover states for the modal color
             const modalColorClass = colorClass.replace(/hover:bg-[^\s]+/g, '');
             return (
