@@ -2,8 +2,22 @@ import React, { useState, useRef, useEffect } from 'react';
 import { X, Send, Bot, User } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 
-export function ChatWidget({ title = "Asistente de Proyectos", subtitle = "Impulsado por Vertex AI", showClose = false, onClose }: { title?: string, subtitle?: string, showClose?: boolean, onClose?: () => void }) {
-  const [messages, setMessages] = useState<{role: 'user'|'model', content: string}[]>([]);
+export function ChatWidget({ 
+  title = "Asistente de Proyectos", 
+  subtitle = "Impulsado por Vertex AI", 
+  showClose = false, 
+  onClose,
+  initialMessages = [],
+  onMessagesChange
+}: { 
+  title?: string, 
+  subtitle?: string, 
+  showClose?: boolean, 
+  onClose?: () => void,
+  initialMessages?: {role: 'user'|'model', content: string}[],
+  onMessagesChange?: (messages: {role: 'user'|'model', content: string}[]) => void
+}) {
+  const [messages, setMessages] = useState<{role: 'user'|'model', content: string}[]>(initialMessages);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -19,6 +33,7 @@ export function ChatWidget({ title = "Asistente de Proyectos", subtitle = "Impul
     setInput('');
     const newMessages = [...messages, { role: 'user' as const, content: userMessage }];
     setMessages(newMessages);
+    if (onMessagesChange) onMessagesChange(newMessages);
     setIsLoading(true);
 
     try {
@@ -28,9 +43,13 @@ export function ChatWidget({ title = "Asistente de Proyectos", subtitle = "Impul
         body: JSON.stringify({ message: userMessage, history: messages })
       });
       const data = await res.json();
-      setMessages([...newMessages, { role: 'model', content: data.reply || data.error }]);
+      const finalMessages = [...newMessages, { role: 'model' as const, content: data.reply || data.error }];
+      setMessages(finalMessages);
+      if (onMessagesChange) onMessagesChange(finalMessages);
     } catch (error) {
-      setMessages([...newMessages, { role: 'model', content: "Hubo un error de conexión." }]);
+      const errorMessages = [...newMessages, { role: 'model' as const, content: "Hubo un error de conexión." }];
+      setMessages(errorMessages);
+      if (onMessagesChange) onMessagesChange(errorMessages);
     } finally {
       setIsLoading(false);
     }
@@ -114,13 +133,23 @@ export function ChatWidget({ title = "Asistente de Proyectos", subtitle = "Impul
   );
 }
 
-export function ChatModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
+export function ChatModal({ 
+  isOpen, 
+  onClose,
+  initialMessages = [],
+  onMessagesChange 
+}: { 
+  isOpen: boolean; 
+  onClose: () => void;
+  initialMessages?: {role: 'user'|'model', content: string}[];
+  onMessagesChange?: (messages: {role: 'user'|'model', content: string}[]) => void;
+}) {
   if (!isOpen) return null;
 
   return (
     <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex justify-center items-center p-4">
       <div className="bg-white rounded-2xl w-full max-w-2xl h-[80vh] shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
-         <ChatWidget showClose={true} onClose={onClose} />
+         <ChatWidget showClose={true} onClose={onClose} initialMessages={initialMessages} onMessagesChange={onMessagesChange} />
       </div>
     </div>
   );

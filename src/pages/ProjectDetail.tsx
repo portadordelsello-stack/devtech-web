@@ -56,13 +56,26 @@ export default function ProjectDetail({ user }: { user: any }) {
           navigate('/dashboard');
         }
       } catch (error) {
-        handleFirestoreError(error, OperationType.GET, `projects/${id}`, auth);
+        handleFirestoreError(error, OperationType.GET, `projects/${id}`);
       } finally {
         setLoading(false);
       }
     };
     fetchProject();
   }, [id, user, navigate]);
+
+  const handleChatMessagesChange = async (messages: {role: 'user'|'model', content: string}[]) => {
+    if (!id || !project) return;
+    setProject({ ...project, chatHistory: messages });
+    try {
+      await updateDoc(doc(db, 'projects', id), {
+        chatHistory: messages,
+        updatedAt: serverTimestamp()
+      });
+    } catch (error) {
+      console.error("Error saving chat history", error);
+    }
+  };
 
   const handleEstimateBudget = async () => {
     if (!id || tasks.length === 0) {
@@ -202,7 +215,12 @@ export default function ProjectDetail({ user }: { user: any }) {
           </div>
           
           <div className="bg-white rounded-2xl shadow-sm border border-slate-200 flex-1 min-h-[400px] overflow-hidden flex flex-col">
-             <ChatWidget title="Asistente de Proyectos" subtitle="Impulsado por Vertex AI" />
+             <ChatWidget 
+               title="Asistente de Proyectos" 
+               subtitle="Impulsado por Vertex AI"
+               initialMessages={project?.chatHistory || []}
+               onMessagesChange={handleChatMessagesChange}
+             />
           </div>
         </div>
 

@@ -22,7 +22,7 @@ const initialNodes: Node[] = [
   {
     id: 'root',
     type: 'editable',
-    data: { label: 'Idea Central' },
+    data: { label: 'Mi Negocio / Reto Principal' },
     position: { x: 250, y: 250 }
   },
 ];
@@ -45,6 +45,17 @@ export function MindMapComponent({ projectId, savedNodes, savedEdges }: { projec
     );
   }, [setNodes]);
 
+  const updateNodeColor = useCallback((nodeId: string, colorId: string) => {
+    setNodes((nds) =>
+      nds.map((node) => {
+        if (node.id === nodeId) {
+          node.data = { ...node.data, colorId };
+        }
+        return node;
+      })
+    );
+  }, [setNodes]);
+
   const nodeTypes = useMemo(() => ({
     editable: EditableNode
   }), []);
@@ -56,10 +67,11 @@ export function MindMapComponent({ projectId, savedNodes, savedEdges }: { projec
       type: node.type || 'editable',
       data: {
         ...node.data,
-        onChange: (evt: React.ChangeEvent<HTMLInputElement>) => updateNodeLabel(node.id, evt.target.value)
+        onChange: (evt: React.ChangeEvent<HTMLTextAreaElement>) => updateNodeLabel(node.id, evt.target.value),
+        onColorChange: (colorId: string) => updateNodeColor(node.id, colorId)
       }
     }));
-  }, [nodes, updateNodeLabel]);
+  }, [nodes, updateNodeLabel, updateNodeColor]);
 
   const onConnect = useCallback(
     (params: Connection | Edge) => setEdges((eds) => addEdge({ ...params, animated: true }, eds)),
@@ -80,7 +92,7 @@ export function MindMapComponent({ projectId, savedNodes, savedEdges }: { projec
     setIsSaving(true);
     try {
       await updateDoc(doc(db, 'projects', projectId), {
-        mindmapNodes: nodes.map(n => ({ id: n.id, type: n.type, position: n.position, data: { label: n.data.label } })), // clean out the onChange function
+        mindmapNodes: nodes.map(n => ({ id: n.id, type: n.type, position: n.position, data: { label: n.data.label, colorId: n.data.colorId } })), // clean out the functions
         mindmapEdges: edges,
         updatedAt: serverTimestamp()
       });
@@ -106,6 +118,17 @@ export function MindMapComponent({ projectId, savedNodes, savedEdges }: { projec
         <Controls />
         <MiniMap zoomable pannable />
         
+        <Panel position="top-left" className="bg-white/90 backdrop-blur p-4 rounded-xl shadow-sm border border-slate-200 m-4 max-w-xs pointer-events-none">
+          <h4 className="font-bold text-sm text-slate-800 mb-2">Guía del Mapa</h4>
+          <p className="text-xs text-slate-500 mb-3 leading-relaxed">Arrastra un enlace desde los puntos de un nodo a otro para conectarlos. Al pasar el mouse sobre un nodo, puedes cambiar su color:</p>
+          <ul className="text-xs space-y-2">
+            <li className="flex items-center gap-2"><span className="w-3 h-3 rounded-full bg-rose-200 border border-rose-400"></span><span className="text-slate-600"><strong>Dolor:</strong> El problema del cliente (Ej: Entregas tarde)</span></li>
+            <li className="flex items-center gap-2"><span className="w-3 h-3 rounded-full bg-emerald-200 border border-emerald-400"></span><span className="text-slate-600"><strong>Solución:</strong> Qué haremos (Ej: App de rastreo)</span></li>
+            <li className="flex items-center gap-2"><span className="w-3 h-3 rounded-full bg-amber-200 border border-amber-400"></span><span className="text-slate-600"><strong>Beneficio:</strong> Qué ganamos (Ej: Cero quejas)</span></li>
+            <li className="flex items-center gap-2"><span className="w-3 h-3 rounded-full bg-violet-200 border border-violet-400"></span><span className="text-slate-600"><strong>Métrica:</strong> Cómo lo medimos (Ej: Tiempo de envío)</span></li>
+          </ul>
+        </Panel>
+
         <Panel position="top-right" className="flex gap-2">
           <button 
             onClick={addNode}

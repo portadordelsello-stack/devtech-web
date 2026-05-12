@@ -22,7 +22,13 @@
         "ownerId": { "type": "string" },
         "status": { "type": "string", "enum": ["draft", "active", "completed"] },
         "createdAt": { "type": "string" },
-        "updatedAt": { "type": "string" }
+        "updatedAt": { "type": "string" },
+        "mindmapNodes": { "type": "array" },
+        "mindmapEdges": { "type": "array" },
+        "chatHistory": { "type": "array" },
+        "tasks": { "type": "array" },
+        "requirementsChat": { "type": "string" },
+        "budgetEstimate": { "type": "string" }
       },
       "required": ["name", "ownerId", "status", "createdAt", "updatedAt"]
     }
