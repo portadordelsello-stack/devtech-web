@@ -27,7 +27,7 @@ export function BusinessModelCanvas({ data, isGenerating }: { data?: BMCData, is
   const renderList = (items?: string[], sectionTitle?: string) => {
     if (!items || items.length === 0) return <p className="text-slate-400 text-xs italic">Aún sin definir</p>;
     return (
-      <div className="flex flex-col gap-2">
+      <div className="flex flex-wrap gap-2">
          {items.map((item, i) => {
             const colorClass = colors[i % colors.length];
             // Remove hover states for the modal color
@@ -35,13 +35,12 @@ export function BusinessModelCanvas({ data, isGenerating }: { data?: BMCData, is
             return (
               <div 
                 key={i} 
+                title={item}
                 onClick={() => setSelectedItem({ title: sectionTitle || '', content: item, color: modalColorClass })}
-                className={`cursor-pointer border rounded-md shadow-sm p-3 w-full transition-all hover:-translate-y-0.5 hover:shadow-md ${colorClass}`}
+                className={`cursor-pointer border rounded-md shadow-sm w-10 h-10 flex items-center justify-center transition-all hover:-translate-y-1 hover:shadow-md ${colorClass} relative overflow-hidden group`}
               >
-                 <p className="text-sm line-clamp-3 leading-relaxed">{item}</p>
-                 {item.length > 100 && (
-                   <span className="text-[10px] opacity-60 mt-1 block">Ver más...</span>
-                 )}
+                 <div className="absolute top-0 right-0 w-2.5 h-2.5 bg-black/5 opacity-50 rounded-bl-sm"></div>
+                 <FileText className="w-4 h-4 opacity-40 group-hover:opacity-70 transition-opacity" />
               </div>
             )
          })}
