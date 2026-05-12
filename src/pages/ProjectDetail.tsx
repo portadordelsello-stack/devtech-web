@@ -3,7 +3,7 @@ import { useParams, Link, useNavigate } from 'react-router-dom';
 import { auth, db } from '../firebase';
 import { doc, getDoc, updateDoc, serverTimestamp } from 'firebase/firestore';
 import { handleFirestoreError, OperationType } from '../lib/firestoreUtils';
-import { Bot, ArrowLeft, BrainCircuit, CheckSquare, DollarSign, Send, User, Loader2, Save, Network, Check, Info, X, ZoomIn, ZoomOut, Maximize } from 'lucide-react';
+import { Bot, ArrowLeft, BrainCircuit, CheckSquare, DollarSign, Send, User, Loader2, Save, Network, Check, Info, X, ZoomIn, ZoomOut, Maximize, Expand, Shrink } from 'lucide-react';
 import { ChatWidget } from '../components/ChatModal';
 import { TransformWrapper, TransformComponent, useControls } from 'react-zoom-pan-pinch';
 
@@ -24,6 +24,7 @@ export default function ProjectDetail({ user }: { user: any }) {
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<'mindmap' | 'budget' | 'admin'>('mindmap');
   const [showGuide, setShowGuide] = useState(false);
+  const [isFullscreen, setIsFullscreen] = useState(false);
 
   const [tasks, setTasks] = useState<Task[]>([]);
   const [newTaskTitle, setNewTaskTitle] = useState('');
@@ -208,7 +209,7 @@ export default function ProjectDetail({ user }: { user: any }) {
         {/* Content Area */}
         <div className="flex-1 bg-white rounded-2xl shadow-sm border border-slate-200 flex flex-col h-[75vh] min-h-[500px]">
           {activeTab === 'mindmap' && (
-            <div className="flex-1 flex flex-col p-6 bg-slate-50/50 rounded-2xl overflow-hidden">
+            <div className={isFullscreen ? "fixed inset-0 z-50 bg-white p-6 flex flex-col shadow-2xl" : "flex-1 flex flex-col p-6 bg-slate-50/50 rounded-2xl overflow-hidden"}>
               <div className="flex items-center justify-between mb-6">
                 <div>
                   <div className="flex items-center gap-2">
@@ -219,6 +220,7 @@ export default function ProjectDetail({ user }: { user: any }) {
                   </div>
                   <p className="text-slate-500 text-sm">Visualiza la estructura y estado de las tareas de manera conectada.</p>
                 </div>
+                {/* Fullscreen toggle inside header if wanted, or in map. Putting it in map controls is better */}
               </div>
               
               <div className="flex-1 overflow-hidden bg-[#fafafa] rounded-xl border border-slate-200 relative bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px] shadow-inner">
@@ -240,6 +242,10 @@ export default function ProjectDetail({ user }: { user: any }) {
                          </button>
                          <button onClick={() => resetTransform()} className="p-2 bg-white rounded-lg shadow-sm border border-slate-200 text-slate-600 hover:text-indigo-600 hover:bg-indigo-50 transition" title="Restaurar zoom">
                            <Maximize className="w-5 h-5" />
+                         </button>
+                         <div className="w-px bg-slate-200 mx-1"></div>
+                         <button onClick={() => setIsFullscreen(!isFullscreen)} className="p-2 bg-white rounded-lg shadow-sm border border-slate-200 text-slate-600 hover:text-indigo-600 hover:bg-indigo-50 transition" title={isFullscreen ? "Salir de pantalla completa" : "Pantalla completa"}>
+                           {isFullscreen ? <Shrink className="w-5 h-5" /> : <Expand className="w-5 h-5" />}
                          </button>
                        </div>
                        <TransformComponent wrapperClass="w-full h-full cursor-grab active:cursor-grabbing" contentClass="p-16 min-w-max flex items-center justify-start">
