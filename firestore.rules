@@ -33,6 +33,16 @@ service cloud.firestore {
         && data.status is string && data.status in ['draft', 'active', 'completed'];
     }
 
+    // Validation Blueprint for Workshop
+    function isValidWorkshopRegistration(data) {
+      return data.keys().hasAll(['name', 'email', 'whatsapp', 'problem', 'status', 'createdAt'])
+        && data.name is string && data.name.size() <= 150
+        && data.email is string && data.email.size() <= 256
+        && data.whatsapp is string && data.whatsapp.size() <= 50
+        && data.problem is string && data.problem.size() <= 5000
+        && data.status is string && data.status in ['pending', 'contacted', 'reminded'];
+    }
+
     match /users/{userId} {
       allow read: if isSignedIn() && (userId == request.auth.uid || isAdmin());
       allow create: if isSignedIn() 
@@ -74,6 +84,20 @@ service cloud.firestore {
             (incoming().diff(existing()).affectedKeys().hasOnly(['name', 'status', 'updatedAt', 'requirementsChat', 'tasks', 'budgetEstimate', 'mindmapNodes', 'mindmapEdges', 'chatHistory', 'businessModelCanvas']))
            );
       allow delete: if isAdmin() || (isSignedIn() && existing().ownerId == request.auth.uid);
+    }
+
+    match /workshopRegistrations/{registrationId} {
+      allow list, read: if isAdmin();
+      allow create: if isValidId(registrationId)
+        && isValidWorkshopRegistration(incoming())
+        && incoming().createdAt == request.time
+        && incoming().status == 'pending'
+        && incoming().keys().hasOnly(['name', 'email', 'whatsapp', 'problem', 'status', 'createdAt']);
+      allow update: if isAdmin() 
+        && isValidWorkshopRegistration(incoming())
+        && incoming().createdAt == existing().createdAt
+        && incoming().diff(existing()).affectedKeys().hasOnly(['status']);
+      allow delete: if isAdmin();
     }
   }
 }

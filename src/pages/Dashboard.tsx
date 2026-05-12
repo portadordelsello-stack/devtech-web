@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { auth, db } from '../firebase';
-import { doc, getDoc, setDoc, collection, query, where, getDocs, serverTimestamp, onSnapshot } from 'firebase/firestore';
+import { doc, getDoc, setDoc, updateDoc, collection, query, where, getDocs, serverTimestamp, onSnapshot } from 'firebase/firestore';
 import { Link } from 'react-router-dom';
 import { handleFirestoreError, OperationType } from '../lib/firestoreUtils';
 import { LogOut, Plus, Settings, Briefcase, FileText } from 'lucide-react';
@@ -18,6 +18,16 @@ export default function Dashboard({ user }: { user: any }) {
   const [phone, setPhone] = useState('');
   const [name, setName] = useState(user?.displayName || '');
   const [showAdminConfig, setShowAdminConfig] = useState(false);
+  const [showRegistrations, setShowRegistrations] = useState(false);
+  const [registrations, setRegistrations] = useState<any[]>([]);
+  
+  useEffect(() => {
+    if (!isAdmin) return;
+    const unsubRegistrations = onSnapshot(collection(db, 'workshopRegistrations'), (snapshot) => {
+      setRegistrations(snapshot.docs.map(d => ({id: d.id, ...d.data()})));
+    });
+    return () => unsubRegistrations();
+  }, [isAdmin]);
 
   useEffect(() => {
     if (!user) return;
@@ -135,6 +145,7 @@ export default function Dashboard({ user }: { user: any }) {
       <header className="bg-white border-b border-slate-200 px-6 py-4 flex items-center justify-between">
         <div className="font-bold text-xl">DevTech {isAdmin && <span className="text-indigo-600 border border-indigo-200 bg-indigo-50 px-2 py-0.5 rounded-md text-xs ml-2">ADMIN</span>}</div>
         <div className="flex items-center gap-4">
+          <Link to="/" className="text-sm font-medium text-slate-600 hover:text-black">Ir a Landing</Link>
           <span className="text-sm font-medium text-slate-600">{user.email}</span>
           <button onClick={handleLogout} className="p-2 text-slate-400 hover:bg-slate-100 rounded-full transition"><LogOut className="w-5 h-5" /></button>
         </div>
@@ -154,7 +165,23 @@ export default function Dashboard({ user }: { user: any }) {
                 <div className="w-10 h-10 bg-slate-100 rounded-full flex items-center justify-center">
                    <Settings className="w-5 h-5" />
                 </div>
-                Configuración Vertex IA
+                Configuración del Sistema
+              </button>
+              <button 
+                onClick={() => setShowRegistrations(!showRegistrations)} 
+                className={`w-full flex items-center justify-between p-3 text-left rounded-xl transition font-medium ${showRegistrations ? 'bg-indigo-50 text-indigo-700' : 'hover:bg-slate-50 text-slate-700'}`}
+              >
+                <div className="flex items-center gap-3">
+                  <div className={`w-10 h-10 rounded-full flex items-center justify-center ${showRegistrations ? 'bg-indigo-100' : 'bg-slate-100'}`}>
+                     <FileText className="w-5 h-5" />
+                  </div>
+                  Registros Workshop
+                </div>
+                {registrations.length > 0 && (
+                  <span className="bg-indigo-600 text-white text-[10px] font-bold px-2 py-1 rounded-full">
+                    {registrations.length}
+                  </span>
+                )}
               </button>
             </div>
 
@@ -168,65 +195,126 @@ export default function Dashboard({ user }: { user: any }) {
 
         {/* Main Panel */}
         <div className={`${isAdmin ? 'md:col-span-2' : ''} space-y-6`}>
-           <div className="mb-2">
-             <h2 className="text-3xl font-bold tracking-tight text-slate-900 mb-2">Consola de Proyectos</h2>
-             <p className="text-slate-500 font-medium">
-               {isAdmin 
-                 ? 'Panel de administración general de requerimientos y desarrollos globales.' 
-                 : 'Administra tus aplicaciones y supervisa el avance de tus desarrollos.'}
-             </p>
-           </div>
-           
-           <div className="flex items-center justify-between mt-8">
-              <h3 className="text-xl font-bold tracking-tight">Proyectos {isAdmin ? 'Globales' : 'Activos'}</h3>
-              {!isAdmin && (
-                <button onClick={() => setShowCreate(true)} className="flex items-center gap-2 bg-black text-white px-4 py-2 rounded-full text-sm font-bold hover:bg-slate-800 transition">
-                  <Plus className="w-4 h-4" /> Nuevo Proyecto
-                </button>
-              )}
-           </div>
-
-           {showCreate && !isAdmin && (
-              <form onSubmit={handleUpdateProfileAndCreateProject} className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex items-end gap-4">
-                 <div className="flex-1">
-                   <label className="block text-xs font-bold text-slate-500 uppercase mb-1">Nombre</label>
-                   <input type="text" value={newProjectName} onChange={e => setNewProjectName(e.target.value)} className="w-full px-4 py-2 border rounded-xl bg-slate-50" placeholder="Nuevo requerimiento" autoFocus required />
-                 </div>
-                 <button type="submit" className="bg-indigo-600 text-white font-bold px-6 py-2 rounded-xl hover:bg-indigo-700 transition h-[42px] mb-[1px]">Guardar</button>
-                 <button type="button" onClick={() => setShowCreate(false)} className="text-slate-500 font-bold px-4 py-2 hover:bg-slate-100 rounded-xl h-[42px]">Cancelar</button>
-              </form>
-           )}
-
-           <div className="space-y-4">
-             {projects.length === 0 && !showCreate && (
-               <div className="bg-slate-100/50 border border-dashed border-slate-300 rounded-2xl p-10 text-center">
-                 <FileText className="w-12 h-12 text-slate-300 mx-auto mb-3" />
-                 <p className="text-slate-500 font-medium">No hay proyectos actualmente.</p>
+           {isAdmin && showRegistrations ? (
+             <div>
+               <div className="mb-8">
+                 <h2 className="text-3xl font-bold tracking-tight text-slate-900 mb-2">Registros del Workshop</h2>
+                 <p className="text-slate-500 font-medium">Gestiona y contacta a los interesados en el Workshop.</p>
                </div>
-             )}
-             {projects.map(p => (
-               <div key={p.id} className="bg-white border text-left border-slate-200 p-6 rounded-2xl shadow-sm hover:border-indigo-200 transition-colors cursor-default flex items-center justify-between">
-                 <div>
-                   <h3 className="font-bold text-lg">{p.name}</h3>
-                   <div className="flex items-center gap-3 mt-2 text-xs font-medium uppercase tracking-widest text-slate-400">
-                     <span className={`px-2 py-0.5 rounded-md ${
-                       p.status === 'draft' ? 'bg-slate-100 text-slate-600' :
-                       p.status === 'pending_quote' ? 'bg-yellow-100 text-yellow-700 font-bold' :
-                       'bg-green-100 text-green-700'
-                     }`}>
-                       {p.status === 'draft' ? 'En Definición' : 
-                        p.status === 'pending_quote' ? 'Solicitud de Cotización' : 
-                        p.status}
-                     </span>
-                     {isAdmin && <span>ID: {p.ownerId.slice(0, 8)}...</span>}
+               
+               <div className="space-y-4">
+                 {registrations.length === 0 && (
+                   <div className="bg-slate-100/50 border border-dashed border-slate-300 rounded-2xl p-10 text-center">
+                     <FileText className="w-12 h-12 text-slate-300 mx-auto mb-3" />
+                     <p className="text-slate-500 font-medium">Aún no hay registros.</p>
                    </div>
-                 </div>
-                 <Link to={`/project/${p.id}`} className="text-indigo-600 font-bold text-sm bg-indigo-50 px-4 py-2 rounded-full hover:bg-indigo-100 hidden md:block">
-                   Ver Detalles
-                 </Link>
+                 )}
+                 {registrations.map(reg => (
+                   <div key={reg.id} className="bg-white border text-left border-slate-200 p-6 rounded-2xl shadow-sm hover:border-indigo-200 transition-colors">
+                     <div className="flex justify-between items-start mb-4">
+                       <div>
+                         <h3 className="font-bold text-lg text-slate-900">{reg.name}</h3>
+                         <p className="text-sm text-slate-500">{reg.email}</p>
+                       </div>
+                       <span className={`px-2 py-1 rounded-md text-xs font-bold uppercase tracking-widest ${
+                         reg.status === 'pending' ? 'bg-amber-100 text-amber-700' :
+                         reg.status === 'contacted' ? 'bg-indigo-100 text-indigo-700' :
+                         'bg-emerald-100 text-emerald-700'
+                       }`}>
+                         {reg.status}
+                       </span>
+                     </div>
+                     <div className="bg-slate-50 p-4 rounded-xl mb-4 border border-slate-100">
+                       <p className="text-sm font-bold text-slate-700 mb-1">Desafío a resolver:</p>
+                       <p className="text-sm text-slate-600">{reg.problem}</p>
+                     </div>
+                     <div className="flex items-center justify-between">
+                       <div className="text-sm text-slate-500">
+                         <strong>WhatsApp:</strong> {reg.whatsapp}
+                       </div>
+                       <select 
+                         value={reg.status}
+                         onChange={async (e) => {
+                           try {
+                             await updateDoc(doc(db, 'workshopRegistrations', reg.id), { status: e.target.value });
+                           } catch (err) {
+                             console.error(err);
+                           }
+                         }}
+                         className="text-sm bg-white border border-slate-200 rounded-lg px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                       >
+                         <option value="pending">Pendiente</option>
+                         <option value="contacted">Contactado</option>
+                         <option value="reminded">Recordatorio Enviado</option>
+                       </select>
+                     </div>
+                   </div>
+                 ))}
                </div>
-             ))}
-           </div>
+             </div>
+           ) : (
+             <>
+               <div className="mb-2">
+                 <h2 className="text-3xl font-bold tracking-tight text-slate-900 mb-2">Consola de Proyectos</h2>
+                 <p className="text-slate-500 font-medium">
+                   {isAdmin 
+                     ? 'Panel de administración general de requerimientos y desarrollos globales.' 
+                     : 'Administra tus aplicaciones y supervisa el avance de tus desarrollos.'}
+                 </p>
+               </div>
+               
+               <div className="flex items-center justify-between mt-8">
+                  <h3 className="text-xl font-bold tracking-tight">Proyectos {isAdmin ? 'Globales' : 'Activos'}</h3>
+                  {!isAdmin && (
+                    <button onClick={() => setShowCreate(true)} className="flex items-center gap-2 bg-black text-white px-4 py-2 rounded-full text-sm font-bold hover:bg-slate-800 transition">
+                      <Plus className="w-4 h-4" /> Nuevo Proyecto
+                    </button>
+                  )}
+               </div>
+
+               {showCreate && !isAdmin && (
+                  <form onSubmit={handleUpdateProfileAndCreateProject} className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex items-end gap-4">
+                     <div className="flex-1">
+                       <label className="block text-xs font-bold text-slate-500 uppercase mb-1">Nombre</label>
+                       <input type="text" value={newProjectName} onChange={e => setNewProjectName(e.target.value)} className="w-full px-4 py-2 border rounded-xl bg-slate-50" placeholder="Nuevo requerimiento" autoFocus required />
+                     </div>
+                     <button type="submit" className="bg-indigo-600 text-white font-bold px-6 py-2 rounded-xl hover:bg-indigo-700 transition h-[42px] mb-[1px]">Guardar</button>
+                     <button type="button" onClick={() => setShowCreate(false)} className="text-slate-500 font-bold px-4 py-2 hover:bg-slate-100 rounded-xl h-[42px]">Cancelar</button>
+                  </form>
+               )}
+
+               <div className="space-y-4">
+                 {projects.length === 0 && !showCreate && (
+                   <div className="bg-slate-100/50 border border-dashed border-slate-300 rounded-2xl p-10 text-center">
+                     <FileText className="w-12 h-12 text-slate-300 mx-auto mb-3" />
+                     <p className="text-slate-500 font-medium">No hay proyectos actualmente.</p>
+                   </div>
+                 )}
+                 {projects.map(p => (
+                   <div key={p.id} className="bg-white border text-left border-slate-200 p-6 rounded-2xl shadow-sm hover:border-indigo-200 transition-colors cursor-default flex items-center justify-between">
+                     <div>
+                       <h3 className="font-bold text-lg">{p.name}</h3>
+                       <div className="flex items-center gap-3 mt-2 text-xs font-medium uppercase tracking-widest text-slate-400">
+                         <span className={`px-2 py-0.5 rounded-md ${
+                           p.status === 'draft' ? 'bg-slate-100 text-slate-600' :
+                           p.status === 'pending_quote' ? 'bg-yellow-100 text-yellow-700 font-bold' :
+                           'bg-green-100 text-green-700'
+                         }`}>
+                           {p.status === 'draft' ? 'En Definición' : 
+                            p.status === 'pending_quote' ? 'Solicitud de Cotización' : 
+                            p.status}
+                         </span>
+                         {isAdmin && <span>ID: {p.ownerId.slice(0, 8)}...</span>}
+                       </div>
+                     </div>
+                     <Link to={`/project/${p.id}`} className="text-indigo-600 font-bold text-sm bg-indigo-50 px-4 py-2 rounded-full hover:bg-indigo-100 hidden md:block">
+                       Ver Detalles
+                     </Link>
+                   </div>
+                 ))}
+               </div>
+             </>
+           )}
         </div>
 
       </main>
@@ -235,7 +323,7 @@ export default function Dashboard({ user }: { user: any }) {
 }
 
 function AdminConfigForm() {
-  const [adminConfig, setAdminConfig] = useState({ apiKey: '', projectId: '', location: '' });
+  const [adminConfig, setAdminConfig] = useState({ apiKey: '', projectId: '', location: '', resendApiKey: '' });
   const [isSaving, setIsSaving] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
 
@@ -246,7 +334,8 @@ function AdminConfigForm() {
           setAdminConfig({
               apiKey: data.apiKey || '',
               projectId: data.projectId || '',
-              location: data.location || ''
+              location: data.location || '',
+              resendApiKey: data.resendApiKey || ''
           });
       })
       .catch(err => console.error("Error fetching config:", err));
@@ -302,6 +391,16 @@ function AdminConfigForm() {
             onChange={e => setAdminConfig({...adminConfig, location: e.target.value})}
             className="w-full px-3 py-2 border rounded-lg text-sm bg-white focus:ring-2 focus:ring-indigo-500 outline-none"
             placeholder="us-central1"
+          />
+        </div>
+        <div>
+          <label className="block text-[10px] font-bold text-slate-500 uppercase mb-1">Resend API Key (Para Emails)</label>
+          <input 
+            type="password" 
+            value={adminConfig.resendApiKey}
+            onChange={e => setAdminConfig({...adminConfig, resendApiKey: e.target.value})}
+            className="w-full px-3 py-2 border rounded-lg text-sm bg-white focus:ring-2 focus:ring-indigo-500 outline-none"
+            placeholder="re_..."
           />
         </div>
         <button 

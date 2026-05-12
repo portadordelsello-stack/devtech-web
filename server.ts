@@ -3,15 +3,18 @@ import { createServer as createViteServer } from "vite";
 import path from "path";
 import fs from "fs";
 import { GoogleGenAI, Type } from '@google/genai';
+import { Resend } from 'resend';
 
 let ai: GoogleGenAI | null = null;
+let resend: Resend | null = null;
 const configPath = path.join(process.cwd(), 'system-config.json');
 
 function getSystemConfig() {
   let cfg = {
     apiKey: process.env.VERTEX_API_KEY || '',
     projectId: process.env.VERTEX_PROJECT_ID || '',
-    location: process.env.VERTEX_LOCATION || 'us-central1'
+    location: process.env.VERTEX_LOCATION || 'us-central1',
+    resendApiKey: process.env.RESEND_API_KEY || ''
   };
   
   if (fs.existsSync(configPath)) {
@@ -43,6 +46,14 @@ function initializeAI() {
     ai = null;
     console.log("Inicialización de IA omitida. Faltan configuraciones de Vertex en el Panel de Admin.");
   }
+
+  if (cfg.resendApiKey) {
+    resend = new Resend(cfg.resendApiKey);
+    console.log("Resend inicializado.");
+  } else {
+    resend = null;
+    console.log("Resend omitido (falta API key).");
+  }
 }
 
 // Inicializar al arrancar
@@ -60,14 +71,15 @@ async function startServer() {
   });
 
   app.post('/api/admin/system-config', (req, res) => {
-     const { apiKey, projectId, location } = req.body;
+     const { apiKey, projectId, location, resendApiKey } = req.body;
      const existing = getSystemConfig();
      
      const newConfig = { 
          ...existing, 
          apiKey: apiKey !== undefined ? apiKey : existing.apiKey, 
          projectId: projectId !== undefined ? projectId : existing.projectId, 
-         location: location !== undefined ? location : existing.location
+         location: location !== undefined ? location : existing.location,
+         resendApiKey: resendApiKey !== undefined ? resendApiKey : existing.resendApiKey
      };
 
      fs.writeFileSync(configPath, JSON.stringify(newConfig, null, 2));
@@ -75,6 +87,37 @@ async function startServer() {
      // Reinicializar el cliente de Vertex al instante con las nuevas credenciales
      initializeAI();
      res.json({ success: true });
+  });
+
+  app.post('/api/register-workshop', async (req, res) => {
+    try {
+      const { name, email, problem } = req.body;
+      
+      if (resend) {
+        await resend.emails.send({
+          from: 'DevTech Workshop <onboarding@resend.dev>', // Usar resend.dev para pruebas por ahora si no hay dominio
+          to: [email],
+          subject: '¡Felicidades por dar el primer paso! 🚀',
+          html: `
+            <div style="font-family: sans-serif; padding: 20px; line-height: 1.6; color: #333;">
+              <h2 style="color: #4F46E5;">¡Hola ${name}!</h2>
+              <p>Queríamos felicitarte personalmente por decidirte a transformar tus ideas en herramientas reales.</p>
+              <p>Hemos recibido tu registro con el siguiente desafío:</p>
+              <blockquote style="background: #f9f9f9; border-left: 4px solid #4F46E5; padding: 10px; font-style: italic;">"${problem}"</blockquote>
+              <p>Es un excelente punto de partida. Pronto nos contactaremos por WhatsApp o correo para organizar tu participación en nuestro próximo VibeCoding Workshop.</p>
+              <br/>
+              <p>¡Nos vemos pronto!</p>
+              <p>El equipo de <strong>DevTech</strong></p>
+            </div>
+          `
+        });
+      }
+
+      res.status(200).json({ success: true });
+    } catch (error: any) {
+      console.error("Error en register-workshop:", error);
+      res.status(500).json({ error: error.message });
+    }
   });
 
   // API routes FIRST

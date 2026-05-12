@@ -3,16 +3,41 @@ import { Bot, Sparkles, Globe2, ShoppingBag, LayoutDashboard, MessageSquareMore,
 import { Link, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'motion/react';
 import { signInWithPopup, GoogleAuthProvider } from 'firebase/auth';
-import { auth } from '../firebase';
+import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
+import { auth, db } from '../firebase';
 
 export default function Workshop({ user }: { user: any }) {
   const navigate = useNavigate();
   const [formSubmitted, setFormSubmitted] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [formData, setFormData] = useState({ name: '', email: '', whatsapp: '', problem: '' });
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
-  const handleSubmit = (event: React.FormEvent) => {
+  const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
-    setFormSubmitted(true);
+    setIsSubmitting(true);
+    
+    try {
+       // Save to firestore
+       await addDoc(collection(db, 'workshopRegistrations'), {
+         ...formData,
+         status: 'pending',
+         createdAt: serverTimestamp()
+       });
+
+       // Trigger email via backend endpoint
+       await fetch('/api/register-workshop', {
+         method: 'POST',
+         headers: { 'Content-Type': 'application/json' },
+         body: JSON.stringify(formData)
+       });
+       
+       setFormSubmitted(true);
+    } catch (e) {
+       console.error("Error submitting form", e);
+    } finally {
+       setIsSubmitting(false);
+    }
   };
 
   const handleLogin = async () => {
@@ -401,50 +426,53 @@ export default function Workshop({ user }: { user: any }) {
           </div>
 
           <div>
-            <div className="bg-[#F8F9FA] border border-slate-200 rounded-[2rem] p-8 md:p-12">
-              <div className="mb-10">
-                <h4 className="text-2xl font-bold text-black tracking-tight">Reservá tu lugar</h4>
-                <p className="text-slate-500 mt-2 text-lg">Completá el formulario y contanos qué desafío querés resolver.</p>
+            <div className="bg-slate-900 text-white border border-slate-800 rounded-[2rem] p-8 md:p-12 shadow-[0_0_40px_rgba(0,0,0,0.1)] relative overflow-hidden">
+              <div className="absolute top-0 right-0 p-12 opacity-5 pointer-events-none">
+                <Sparkles className="w-64 h-64" />
+              </div>
+              <div className="mb-10 relative z-10">
+                <h4 className="text-2xl font-bold tracking-tight">Reservá tu lugar</h4>
+                <p className="text-slate-400 mt-2 text-lg">Completá el formulario y contanos qué desafío querés resolver.</p>
               </div>
 
               {formSubmitted ? (
-                <div className="text-center py-12">
-                  <div className="w-20 h-20 bg-white border border-slate-200 rounded-full flex items-center justify-center mx-auto mb-8 shadow-sm">
-                    <CheckCircle2 className="w-10 h-10 text-black" />
+                <div className="text-center py-12 relative z-10">
+                  <div className="w-20 h-20 bg-white/10 border border-white/20 rounded-full flex items-center justify-center mx-auto mb-8 shadow-sm">
+                    <CheckCircle2 className="w-10 h-10 text-white" />
                   </div>
-                  <h3 className="text-3xl font-bold mb-4 text-black tracking-tight">¡Solicitud enviada!</h3>
-                  <p className="text-slate-600 text-lg">
+                  <h3 className="text-3xl font-bold mb-4 tracking-tight">¡Solicitud enviada!</h3>
+                  <p className="text-slate-400 text-lg">
                     Pronto nos pondremos en contacto con más información del workshop.
                   </p>
                 </div>
               ) : (
-                <div>
+                <div className="relative z-10">
                   <form onSubmit={handleSubmit} className="space-y-6">
                     <div>
-                      <label htmlFor="name" className="block text-sm font-bold text-black mb-3">Nombre completo</label>
-                      <input type="text" id="name" required className="w-full bg-white border border-slate-200 text-black px-5 py-4 rounded-xl focus:outline-none focus:ring-1 focus:ring-black focus:border-black transition-all placeholder:text-slate-400" placeholder="Tu nombre" />
+                      <label htmlFor="name" className="block text-sm font-bold mb-3">Nombre completo</label>
+                      <input type="text" id="name" value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})} required className="w-full bg-white/5 border border-white/10 text-white px-5 py-4 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all placeholder:text-white/30" placeholder="Tu nombre" />
                     </div>
 
                     <div>
-                      <label htmlFor="email" className="block text-sm font-bold text-black mb-3">Correo electrónico</label>
-                      <input type="email" id="email" required className="w-full bg-white border border-slate-200 text-black px-5 py-4 rounded-xl focus:outline-none focus:ring-1 focus:ring-black focus:border-black transition-all placeholder:text-slate-400" placeholder="hola@ejemplo.com" />
+                      <label htmlFor="email" className="block text-sm font-bold mb-3">Correo electrónico</label>
+                      <input type="email" id="email" value={formData.email} onChange={e => setFormData({...formData, email: e.target.value})} required className="w-full bg-white/5 border border-white/10 text-white px-5 py-4 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all placeholder:text-white/30" placeholder="hola@ejemplo.com" />
                     </div>
 
                     <div>
-                      <label htmlFor="whatsapp" className="block text-sm font-bold text-black mb-3">WhatsApp</label>
-                      <input type="tel" id="whatsapp" required className="w-full bg-white border border-slate-200 text-black px-5 py-4 rounded-xl focus:outline-none focus:ring-1 focus:ring-black focus:border-black transition-all placeholder:text-slate-400" placeholder="Tu número de contacto" />
+                      <label htmlFor="whatsapp" className="block text-sm font-bold mb-3">WhatsApp</label>
+                      <input type="tel" id="whatsapp" value={formData.whatsapp} onChange={e => setFormData({...formData, whatsapp: e.target.value})} required className="w-full bg-white/5 border border-white/10 text-white px-5 py-4 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all placeholder:text-white/30" placeholder="Tu número de contacto" />
                     </div>
 
                     <div>
-                      <label htmlFor="problem" className="block text-base font-bold text-black mb-3">
+                      <label htmlFor="problem" className="block text-base font-bold mb-3">
                         ¿Qué tarea o problema te gustaría resolver con IA?
                       </label>
 
-                      <textarea id="problem" required rows={4} className="w-full bg-white border border-slate-200 text-black px-5 py-4 rounded-xl focus:outline-none focus:ring-1 focus:ring-black focus:border-black transition-all resize-none placeholder:text-slate-400" placeholder='Ej: “Pierdo tiempo respondiendo mensajes”, “No tengo página web”, “Quiero organizar turnos o pedidos”'></textarea>
+                      <textarea id="problem" value={formData.problem} onChange={e => setFormData({...formData, problem: e.target.value})} required rows={4} className="w-full bg-white/5 border border-white/10 text-white px-5 py-4 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all resize-none placeholder:text-white/30" placeholder='Ej: “Pierdo tiempo respondiendo mensajes”, “No tengo página web”, “Quiero organizar turnos o pedidos”'></textarea>
                     </div>
 
-                    <button type="submit" className="w-full bg-black text-white font-bold text-[13px] tracking-widest uppercase py-5 rounded-full hover:bg-slate-800 transition-all mt-8 flex justify-center items-center gap-3">
-                      Quiero participar
+                    <button type="submit" disabled={isSubmitting} className="w-full bg-white text-slate-900 font-bold text-[13px] tracking-widest uppercase py-5 rounded-full hover:bg-slate-200 transition-all mt-8 flex justify-center items-center gap-3 disabled:opacity-50">
+                      {isSubmitting ? 'Procesando...' : 'Quiero participar'}
                     </button>
                   </form>
                 </div>
