@@ -3,9 +3,9 @@ import { useParams, Link, useNavigate } from 'react-router-dom';
 import { auth, db } from '../firebase';
 import { doc, getDoc, updateDoc, serverTimestamp } from 'firebase/firestore';
 import { handleFirestoreError, OperationType } from '../lib/firestoreUtils';
-import { Bot, ArrowLeft, BrainCircuit, CheckSquare, DollarSign, Send, User, Loader2, Save, Network, Check, Info, X, ZoomIn, ZoomOut, Maximize, Expand, Shrink } from 'lucide-react';
+import { Bot, ArrowLeft, BrainCircuit, CheckSquare, DollarSign, Send, User, Loader2, Save, Network, Check, Info, X } from 'lucide-react';
 import { ChatWidget } from '../components/ChatModal';
-import { TransformWrapper, TransformComponent, useControls } from 'react-zoom-pan-pinch';
+import { MindMapComponent } from '../components/mindmap/MindMap';
 
 type TaskStatus = 'backlog' | 'todo' | 'inprogress' | 'done';
 
@@ -223,105 +223,12 @@ export default function ProjectDetail({ user }: { user: any }) {
                 {/* Fullscreen toggle inside header if wanted, or in map. Putting it in map controls is better */}
               </div>
               
-              <div className="flex-1 overflow-hidden bg-[#fafafa] rounded-xl border border-slate-200 relative bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px] shadow-inner">
-                 <TransformWrapper
-                    initialScale={0.9}
-                    minScale={0.2}
-                    maxScale={4}
-                    centerOnInit={true}
-                    limitToBounds={false}
-                    wheel={{ step: 0.1 }}
-                 >
-                   {({ zoomIn, zoomOut, resetTransform }) => (
-                     <>
-                       <div className="absolute top-4 right-4 z-20 flex gap-2">
-                         <button onClick={() => zoomIn()} className="p-2 bg-white rounded-lg shadow-sm border border-slate-200 text-slate-600 hover:text-indigo-600 hover:bg-indigo-50 transition" title="Acercar">
-                           <ZoomIn className="w-5 h-5" />
-                         </button>
-                         <button onClick={() => zoomOut()} className="p-2 bg-white rounded-lg shadow-sm border border-slate-200 text-slate-600 hover:text-indigo-600 hover:bg-indigo-50 transition" title="Alejar">
-                           <ZoomOut className="w-5 h-5" />
-                         </button>
-                         <button onClick={() => resetTransform()} className="p-2 bg-white rounded-lg shadow-sm border border-slate-200 text-slate-600 hover:text-indigo-600 hover:bg-indigo-50 transition" title="Restaurar zoom">
-                           <Maximize className="w-5 h-5" />
-                         </button>
-                         <div className="w-px bg-slate-200 mx-1"></div>
-                         <button onClick={() => setIsFullscreen(!isFullscreen)} className="p-2 bg-white rounded-lg shadow-sm border border-slate-200 text-slate-600 hover:text-indigo-600 hover:bg-indigo-50 transition" title={isFullscreen ? "Salir de pantalla completa" : "Pantalla completa"}>
-                           {isFullscreen ? <Shrink className="w-5 h-5" /> : <Expand className="w-5 h-5" />}
-                         </button>
-                       </div>
-                       <TransformComponent wrapperClass="w-full h-full cursor-grab active:cursor-grabbing" contentClass="p-32 w-max min-w-full flex items-center justify-start">
-                         <div className="flex items-center gap-12">
-                            {/* Root Node */}
-                    <div className="bg-indigo-600 text-white font-bold px-6 py-4 rounded-2xl shadow-sm border border-indigo-700 w-48 text-center shrink-0 z-10 relative">
-                      {project?.name || 'Proyecto'}
-                      {/* Right connector */}
-                      <div className="absolute top-1/2 -right-12 w-12 border-t-2 border-slate-300"></div>
-                    </div>
-
-                    {/* Level 1: Statuses */}
-                    <div className="flex flex-col gap-12 relative">
-                      {/* Vertical spine for level 1 */}
-                      <div className="absolute left-[-3rem] top-[24px] bottom-[24px] border-l-2 border-slate-300"></div>
-
-                      {columns.map(col => {
-                         const colTasks = tasks.filter(t => t.status === col.id);
-                         return (
-                           <div key={col.id} className="flex items-center gap-12 relative z-10">
-                             {/* Left connector to vertical spine */}
-                             <div className="absolute top-1/2 -left-12 w-12 border-t-2 border-slate-300"></div>
-
-                             {/* Status Node */}
-                             <div className="bg-slate-800 text-white font-medium px-6 py-3 rounded-xl shadow-sm w-40 text-center shrink-0 relative">
-                               {col.title}
-                               {/* Right connector if tasks exist */}
-                               {colTasks.length > 0 && (
-                                 <div className="absolute top-1/2 -right-12 w-12 border-t-2 border-slate-300"></div>
-                               )}
-                             </div>
-
-                             {/* Level 2: Tasks */}
-                             {colTasks.length > 0 && (
-                               <div className="flex flex-col gap-4 relative pl-0">
-                                 {/* Vertical spine for level 2 if multiple tasks */}
-                                 {colTasks.length > 1 && (
-                                   <div className="absolute left-[-3rem] top-[36px] bottom-[36px] border-l-2 border-slate-300 hidden md:block"></div>
-                                 )}
-                                 
-                                 {colTasks.map((task) => (
-                                   <div key={task.id} className="flex items-center relative z-10">
-                                     {/* Left connector to vertical spine Level 2 */}
-                                     {colTasks.length > 1 && (
-                                       <div className="absolute top-1/2 -left-12 w-12 border-t-2 border-slate-300 hidden md:block"></div>
-                                     )}
-
-                                     <div className="bg-white text-slate-800 border border-slate-200 p-4 rounded-xl shadow-sm w-72 hover:border-indigo-300 hover:shadow-md transition shrink-0 relative group">
-                                       <div className="flex justify-between items-start mb-1">
-                                          <h5 className="font-bold text-sm line-clamp-2 pr-6">{task.title}</h5>
-                                       </div>
-                                       {task.description && <p className="text-xs text-slate-500 line-clamp-2 mt-2">{task.description}</p>}
-                                       <div className="mt-3">
-                                          <select 
-                                            value={task.status}
-                                            onChange={(e) => handleStatusChange(task.id, e.target.value as TaskStatus)}
-                                            className="text-xs bg-slate-50 border border-slate-200 rounded-lg px-2 py-1 focus:outline-none focus:ring-1 focus:ring-indigo-500 w-full"
-                                          >
-                                            {columns.map(c => <option key={c.id} value={c.id}>{c.title}</option>)}
-                                          </select>
-                                       </div>
-                                     </div>
-                                   </div>
-                                 ))}
-                               </div>
-                             )}
-                           </div>
-                         );
-                      })}
-                    </div>
-                         </div>
-                       </TransformComponent>
-                     </>
-                   )}
-                 </TransformWrapper>
+              <div className="flex-1 overflow-hidden bg-[#fafafa] rounded-xl border border-slate-200 relative shadow-inner">
+                 <MindMapComponent 
+                    projectId={project.id} 
+                    savedNodes={project.mindmapNodes} 
+                    savedEdges={project.mindmapEdges} 
+                  />
               </div>
 
               {/* Form for new tasks */}
